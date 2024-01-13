@@ -110,7 +110,9 @@ const secretKey = 'kuncirahasia'; // Ganti ini dengan kunci rahasia
 // ini untuk buat akun karyawan
 app.get("/buat_akun_karyawan", (req, res) => {
   if(req.session.status=="login"){
-  res.render("buat_akun_karyawan");
+  res.render("buat_akun_karyawan",{
+    data_masuk:"tidak ada"
+  });
   }
   else{
     res.redirect("/login");
@@ -457,28 +459,49 @@ app.post('/buat_akun', async (req, res) => {
 
 });
 
-app.post("/proses_buat_akun_karyawan", (req, res) => {
+app.post("/proses_buat_akun_karyawan", async (req, res) => {
   const {nama,username,password,nomer_telfon,divisi,lokasi_kerja} = req.body;
   if(req.session.status=="login"){
+
+    const db_data = await kirim_akun_karyawan_violet.findOne({},'username password nama nik divisi lokasi_kerja').sort({ _id: -1 }).exec();
+    const cari_data_sesuai = await kirim_akun_karyawan_violet.findOne({username:username,password:password},'username password nama nik divisi lokasi_kerja').sort({ _id: -1 }).exec();
+    console.log(db_data.nik);
+    const nik_int=parseInt(db_data.nik, 10);
+    const buat_nik_baru=nik_int+1;
+
     const input_akun_karyawan_violet = new kirim_akun_karyawan_violet({
       username:username,
       password: password,
       nama: nama,
-      nik: "005",
+      nik: buat_nik_baru,
       nomer_telfon:nomer_telfon,
       divisi:divisi,
       lokasi_kerja:lokasi_kerja
     });
-    
-    input_akun_karyawan_violet.save();
-    console.log(`${username}`);
-    console.log(`${password}`);
-    console.log(`${nama}`);
-    console.log(`${nomer_telfon}`);
-    console.log(`${divisi}`);
-    console.log(`${lokasi_kerja}`);
 
-    res.redirect("/home");
+    if(cari_data_sesuai){
+      console.log(`data sudah ada`);
+      res.render("buat_akun_karyawan",{
+        username:username,
+        password: password,
+        nama: nama,
+        nomer_telfon:nomer_telfon,
+        divisi:divisi,
+        lokasi_kerja:lokasi_kerja,
+        data_masuk:"ada"
+      });
+    }
+    else{
+      input_akun_karyawan_violet.save();
+      console.log(`${username}`);
+      console.log(`${password}`);
+      console.log(`${nama}`);
+      console.log(`${nomer_telfon}`);
+      console.log(`${divisi}`);
+      console.log(`${lokasi_kerja}`);
+      console.log(`berhasil membuat akun karyawan`);
+      res.redirect("/home");
+    }
   }
   else{
     res.redirect("/login");

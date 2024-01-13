@@ -64,9 +64,11 @@
             <h2>Selamat Datang</h2>
             <% let status = statusnya; %>
             <% if (status === "salah") { %>
-                <p class="error-message">Password dan Username Salah</p>
-            <% } %>
-            <form action="/login/proses_login" method="post">
+                <p class="error-message">Password dan Username Salah!</p>
+            <% }else if(status === "sudah login sekali tolong hubungi HRD atau Developer untuk mereset ulang login") {%>
+                <p class="error-message"><%= statusnya %></p>
+            <%}%>
+                <form action="/login/proses_login" method="post">
                 <div class="mb-3">
                     <label for="username">Username</label>
                     <input name="username" type="text" class="form-control" id="username" placeholder="Masukkan username" required>

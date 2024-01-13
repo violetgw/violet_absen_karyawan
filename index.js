@@ -17,6 +17,8 @@ moment.tz.setDefault('Asia/Jakarta');
 const port =3000;
 
 
+
+
 // client.on('qr', qr => {
 //   qrcode.generate(qr, { small: true });
 // });
@@ -28,8 +30,6 @@ const port =3000;
 
 
 // client.initialize();
-
-
 
 
 // Gunakan cookie-parser sebagai middleware
@@ -63,7 +63,8 @@ const akun_karyawan_violet = new mongoose.Schema({
   nik: String,
   nomer_telfon:String,
   divisi:String,
-  lokasi_kerja:String
+  lokasi_kerja:String,
+  jumlah_login:String
 });
 
 const kirim_akun_karyawan_violet = mongoose.model('akun_karyawan_violets', akun_karyawan_violet);
@@ -75,8 +76,11 @@ const input_akun_karyawan_violet = new kirim_akun_karyawan_violet({
   nik: "005",
   nomer_telfon:"085779336158",
   divisi:"editor",
-  lokasi_kerja:"grand wisata"
+  lokasi_kerja:"grand wisata",
+  jumlah_login:"1"
 });
+
+
 
 // input_akun_karyawan_violet.save();
 
@@ -107,10 +111,41 @@ const secretKey = 'kuncirahasia'; // Ganti ini dengan kunci rahasia
 
 
 
+// funsi untuk akun hitung waktu
+function hitung_waktu_string(waktuAwalBingit, waktuAkhirBingit) {
+  // Waktu awal
+  let waktuAwal = waktuAwalBingit;
+  let [jamAwal, menitAwal, detikAwal] = waktuAwal.split(":").map(Number);
+
+  // Waktu akhir
+  let waktuAkhir = waktuAkhirBingit;
+  let [jamAkhir, menitAkhir, detikAkhir] = waktuAkhir.split(":").map(Number);
+
+  // Konversi waktu ke detik
+  let detikAwalTotal = jamAwal * 3600 + menitAwal * 60 + detikAwal;
+  let detikAkhirTotal = jamAkhir * 3600 + menitAkhir * 60 + detikAkhir;
+
+  // Hitung selisih detik
+  let selisihDetik = detikAkhirTotal - detikAwalTotal;
+
+  // Konversi selisih detik ke jam, menit, dan detik
+  let jamSelisih = Math.floor(selisihDetik / 3600);
+  let sisaDetik = selisihDetik % 3600;
+  let menitSelisih = Math.floor(sisaDetik / 60);
+  let detikSelisih = sisaDetik % 60;
+
+  let jumlahWaktu = `${jamSelisih}:${menitSelisih}:${detikSelisih}`;
+  
+  // Kembalikan hasil perhitungan waktu
+  return jumlahWaktu;
+}
+
 // ini untuk buat akun karyawan
 app.get("/buat_akun_karyawan", (req, res) => {
   if(req.session.status=="login"){
-  res.render("buat_akun_karyawan");
+  res.render("buat_akun_karyawan",{
+    data_masuk:"tidak ada"
+  });
   }
   else{
     res.redirect("/login");
@@ -205,8 +240,8 @@ app.get('/login', async (req, res) => {
 app.post('/login/proses_login', async (req, res) => {
   const { username, password } = req.body;
 
-    const db_data = await kirim_akun_karyawan_violet.findOne({username:username,password:password},'username password nama nik divisi lokasi_kerja').exec();
-if (db_data) {
+    const db_data = await kirim_akun_karyawan_violet.findOne({username:username,password:password},'username password nama nik divisi lokasi_kerja jumlah_login').exec();
+if (db_data && db_data.jumlah_login == "0" ) {
   res.cookie('username',enkripsi(db_data.username, secretKey), {expires: expirationDate,httpOnly: true});
   res.cookie('password',enkripsi(db_data.password, secretKey), {expires: expirationDate,httpOnly: true});
   res.cookie('nama',enkripsi(db_data.nama, secretKey),{expires: expirationDate,httpOnly: true});
@@ -223,8 +258,31 @@ if (db_data) {
   req.session.nik = db_data.nik;
   req.session.divisi = db_data.divisi;
   req.session.status= "login";
+
+  kirim_akun_karyawan_violet.findOneAndUpdate(
+    { username: req.session.username, password:req.session.password },
+    { $set: { jumlah_login: "1" } },
+    { new: true }
+  )
+    .then(updatedDocument => {
+      if (updatedDocument) {
+        console.log('Data berhasil diupdate jumlah loginya:', updatedDocument);
+      } else {
+        console.log('Tidak ada data yang diupdate.');
+      }
+    })
+    .catch(error => {
+      console.error('Terjadi kesalahan:', error);
+    });
+
+
   res.redirect('/home');
-} else {
+}
+else if( db_data && db_data.jumlah_login==="1"){
+  res.redirect('/login?status_login=sudah login sekali tolong hubungi HRD atau Developer untuk mereset ulang login');
+
+}
+else {
   console.log('Data tidak ditemukan');
   res.redirect('/login?status_login=salah');
 }
@@ -296,7 +354,7 @@ app.get("/pilih_absen", async (req, res) => {
         console.log("ya dia ada ada absen pualngnya");
         res.render("pilih_absen",{
           jam_absen_masuk:true,
-          jam_absen_pulang:false
+          jam_absen_pulang:false,
         });
       }
       else{
@@ -394,7 +452,7 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
 
     const sheets = google.sheets('v4');
     const spreadsheetId = "1Jbf0LtbDXsDzdmODbnVMNrZncWJUSl3ebE4KfnJN0_M";
-    const range = "Sheet1!A:H";
+    const range = "Sheet1!A:I";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
     const getCells = await sheets.spreadsheets.values.get({
@@ -403,20 +461,26 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
       range,
     });
 
+    
     // Dapatkan indeks baris yang sesuai dengan session.nik (misalnya, asumsikan session.nik ada di kolom A)
     const rowIndex = getCells.data.values.findIndex(row => row[1] === req.session.nik && row[3] === currentTime.format('YYYY-MM-DD') );
-
     if (rowIndex !== -1) {
-      // Update nilai sel di dalam kolom H di baris yang sesuai
+      console.log(parseInt("12:34:02"));
+      const waktuSelisih = hitung_waktu_string(getCells.data.values[rowIndex][6], currentTime.format('HH:mm:ss') );
+      console.log(parseInt(waktuSelisih,10));
+
+      // Update nilai di dalam kolom H dan I di baris yang sesuai
       await sheets.spreadsheets.values.update({
         auth,
         spreadsheetId,
-        range: `Sheet1!H${rowIndex + 1}`, // +1 karena indeks dimulai dari 0
+        range: `Sheet1!H${rowIndex + 1}:I${rowIndex + 1}`, // +1 karena indeks dimulai dari 0
         valueInputOption: "USER_ENTERED",
         resource: {
-          values: [[currentTime.format('HH:mm:ss')]],
+          values: [[currentTime.format('HH:mm:ss'),"waktuSelisih"]],
         },
       });
+
+    
 
       console.log(`Data Absen yang ke data masuk`);
       console.log(`username = ${req.session.username}`);
@@ -462,6 +526,7 @@ app.post("/proses_buat_akun_karyawan", async (req, res) => {
   if(req.session.status=="login"){
 
     const db_data = await kirim_akun_karyawan_violet.findOne({},'username password nama nik divisi lokasi_kerja').sort({ _id: -1 }).exec();
+    const cari_data_sesuai = await kirim_akun_karyawan_violet.findOne({username:username,password:password},'username password nama nik divisi lokasi_kerja').sort({ _id: -1 }).exec();
     console.log(db_data.nik);
     const nik_int=parseInt(db_data.nik, 10);
     const buat_nik_baru=nik_int+1;
@@ -473,18 +538,33 @@ app.post("/proses_buat_akun_karyawan", async (req, res) => {
       nik: buat_nik_baru,
       nomer_telfon:nomer_telfon,
       divisi:divisi,
-      lokasi_kerja:lokasi_kerja
+      lokasi_kerja:lokasi_kerja,
+      jumlah_login:"0"
     });
 
-    input_akun_karyawan_violet.save();
-    console.log(`${username}`);
-    console.log(`${password}`);
-    console.log(`${nama}`);
-    console.log(`${nomer_telfon}`);
-    console.log(`${divisi}`);
-    console.log(`${lokasi_kerja}`);
-
-    res.redirect("/home");
+    if(cari_data_sesuai){
+      console.log(`data sudah ada`);
+      res.render("buat_akun_karyawan",{
+        username:username,
+        password: password,
+        nama: nama,
+        nomer_telfon:nomer_telfon,
+        divisi:divisi,
+        lokasi_kerja:lokasi_kerja,
+        data_masuk:"ada"
+      });
+    }
+    else{
+      input_akun_karyawan_violet.save();
+      console.log(`${username}`);
+      console.log(`${password}`);
+      console.log(`${nama}`);
+      console.log(`${nomer_telfon}`);
+      console.log(`${divisi}`);
+      console.log(`${lokasi_kerja}`);
+      console.log(`berhasil membuat akun karyawan`);
+      res.redirect("/home");
+    }
   }
   else{
     res.redirect("/login");
