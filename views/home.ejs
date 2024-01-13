@@ -76,20 +76,52 @@
       </a>
       </div>
       <div class="col-xl-3 col-sm-6 col-12">
-        <a href="/pilih_upload">
+        <a href="/form_izin">
         <div class="card">
           <div class="card-body">
             <div class="media">
-              <i class="icon-login font-large-2"></i>
+              <i class="icon-note font-large-2"></i>
               <div class="media-body text-left">
-                <h3>Kirim Pesan</h3>
-                <span>Kirim pesan kepada kontak Anda</span>
+                <h3>Form Izin Sakit/tidak masuk/Cuti </h3>
+                <span>Tempat Izin Tidak Masuk kerja atau sakit dan cuti</span>
               </div>
             </div>
           </div>
         </div>
       </a>
       </div>
+      <% if(divisi === "HRD"){%>
+        <div class="col-xl-3 col-sm-6 col-12">
+          <a href="/buat_akun_karyawan">
+          <div class="card">
+            <div class="card-body">
+              <div class="media">
+                <i class="icon-note font-large-2"></i>
+                <div class="media-body text-left">
+                  <h3>Buat Akun Karyawan </h3>
+                  <span>Buat Akun karyawan</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12">
+          <a href="/data_akun_karyawan">
+          <div class="card">
+            <div class="card-body">
+              <div class="media">
+                <i class="icon-note font-large-2"></i>
+                <div class="media-body text-left">
+                  <h3>Data Akun Karyawan </h3>
+                  <span>Melihat Semua Data Akun Karyawan</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+        </div>
+        <%}%>
       <div class="col-xl-3 col-sm-6 col-12">
         <a href="/logout">
         <div class="card">

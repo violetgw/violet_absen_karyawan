@@ -15,7 +15,11 @@ const moment = require('moment');
 require('moment-timezone');
 moment.tz.setDefault('Asia/Jakarta');
 const port =3000;
+const bodyParser = require('body-parser');
 
+// Gunakan middleware body-parser
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 
@@ -142,7 +146,7 @@ function hitung_waktu_string(waktuAwalBingit, waktuAkhirBingit) {
 
 // ini untuk buat akun karyawan
 app.get("/buat_akun_karyawan", (req, res) => {
-  if(req.session.status=="login"){
+  if(req.session.status=="login" && req.session.divisi === "HRD"){
   res.render("buat_akun_karyawan",{
     data_masuk:"tidak ada"
   });
@@ -152,14 +156,35 @@ app.get("/buat_akun_karyawan", (req, res) => {
   }
 });
 
-// untuk perintah get dan post
-app.get("/sukses_absen", (req, res) => {
-  if(req.session.status=="login"){
-  res.render("berhasil_absen",{      nama : req.session.nama,
+// data akun karyawana
+app.get("/data_akun_karyawan", async (req, res) => {
+  if(req.session.status=="login" && req.session.divisi === "HRD"){
+    
+    const db_data = await kirim_akun_karyawan_violet.find({},'username password nama nik divisi lokasi_kerja jumlah_login nomer_telfon').exec();
+  
+    res.render("data_akun_karyawan",{
+    data_masuk:"tidak ada",
+    nama : req.session.nama,
     username:req.session.username,
     password:req.session.password,
     status_nik:req.session.nik,
     status_login:req.session.status,
+    data_akun_karyawan:db_data
+  });
+  }
+  else{
+    res.redirect("/login");
+  }
+});
+// untuk perintah get dan post
+app.get("/sukses_absen", (req, res) => {
+  if(req.session.status=="login"){
+  res.render("berhasil_absen",{
+    nama : req.session.nama,
+    username:req.session.username,
+    password:req.session.password,
+    status_nik:req.session.nik,
+    status_login:req.session.status
   });
   }else {
     res.rendirect("login")
@@ -241,7 +266,28 @@ app.post('/login/proses_login', async (req, res) => {
   const { username, password } = req.body;
 
     const db_data = await kirim_akun_karyawan_violet.findOne({username:username,password:password},'username password nama nik divisi lokasi_kerja jumlah_login').exec();
-if (db_data && db_data.jumlah_login == "0" ) {
+    if (db_data && db_data.divisi == "HRD" ) {
+      res.cookie('username',enkripsi(db_data.username, secretKey), {expires: expirationDate,httpOnly: true});
+      res.cookie('password',enkripsi(db_data.password, secretKey), {expires: expirationDate,httpOnly: true});
+      res.cookie('nama',enkripsi(db_data.nama, secretKey),{expires: expirationDate,httpOnly: true});
+    
+    
+      console.log('Data ditemukan:');
+      console.log(db_data.username);
+      console.log(db_data.password);
+      console.log(db_data.nama);
+      req.session.username = db_data.username;
+      req.session.password = db_data.password;
+      req.session.lokasi_kerja = db_data.lokasi_kerja;
+      req.session.nama = db_data.nama;
+      req.session.nik = db_data.nik;
+      req.session.divisi = db_data.divisi;
+      req.session.status= "login";
+    
+      res.redirect('/home');
+    }
+
+  else if (db_data && db_data.jumlah_login == "0" ) {
   res.cookie('username',enkripsi(db_data.username, secretKey), {expires: expirationDate,httpOnly: true});
   res.cookie('password',enkripsi(db_data.password, secretKey), {expires: expirationDate,httpOnly: true});
   res.cookie('nama',enkripsi(db_data.nama, secretKey),{expires: expirationDate,httpOnly: true});
@@ -298,7 +344,8 @@ if(req.session.status=="login"){
       nama : req.session.nama,
       username:req.session.username,
       password:req.session.password,
-      status_login:req.session.status                    
+      status_login:req.session.status,
+      divisi:req.session.divisi                    
       });
   }
   else{
@@ -467,7 +514,24 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
     if (rowIndex !== -1) {
       console.log(parseInt("12:34:02"));
       const waktuSelisih = hitung_waktu_string(getCells.data.values[rowIndex][6], currentTime.format('HH:mm:ss') );
+      let jadwal_absen;
       console.log(parseInt(waktuSelisih,10));
+    
+      if(parseInt(waktuSelisih,10) >= 11 && parseInt(getCells.data.values[rowIndex][6]) <= 10 ){
+        console.log("dia long");
+        jadwal_absen = "Long";
+      }else if(parseInt(waktuSelisih,10) >= 5 && parseInt(getCells.data.values[rowIndex][6]) <= 10 ){
+        console.log("dia pagi");
+        jadwal_absen = "pagi";
+      }
+      else if(parseInt(waktuSelisih,10) >= 5 && parseInt(getCells.data.values[rowIndex][6]) >= 11 ){
+        console.log("dia siang");
+        jadwal_absen = "siang";
+      }
+      else{
+        console.log("tidak sesuai jadwal");
+        jadwal_absen = "tidak sesuai";
+      }
 
       // Update nilai di dalam kolom H dan I di baris yang sesuai
       await sheets.spreadsheets.values.update({
@@ -476,7 +540,7 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
         range: `Sheet1!H${rowIndex + 1}:I${rowIndex + 1}`, // +1 karena indeks dimulai dari 0
         valueInputOption: "USER_ENTERED",
         resource: {
-          values: [[currentTime.format('HH:mm:ss'),"waktuSelisih"]],
+          values: [[currentTime.format('HH:mm:ss'),jadwal_absen]],
         },
       });
 
@@ -570,6 +634,49 @@ app.post("/proses_buat_akun_karyawan", async (req, res) => {
     res.redirect("/login");
   }
 });
+
+
+// untuk edit data akun
+app.put('/edit_akun_karyawan/:id_edit', async (req, res) => {
+  try {
+    const { id_edit } = req.params;
+    const { username, password, nama, nik, nomer_telfon,divisi,lokasi_kerja,jumlah_login } = req.body;
+    console.log(req.body);
+
+    
+    const updatedVCF = await kirim_akun_karyawan_violet.findByIdAndUpdate(
+      id_edit,
+      { username, password, nama, nik, nomer_telfon,divisi,lokasi_kerja,jumlah_login  },
+      { new: true } 
+    );
+
+    res.json(updatedVCF);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Terjadi kesalahan server.' });
+  }
+});
+
+app.put('/hapus_kontak/:id_hapus_kontak', async (req, res) => {
+  try {
+    const { id_hapus_kontak } = req.params;
+    const { Hapus } = req.body;
+    console.log(req.body);
+
+    if(Hapus == true){
+      const HapusVCF = await VCF.deleteOne({_id:id_hapus_kontak});
+      res.json(HapusVCF);
+    }
+    else{
+      console.log("datanya false");
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Terjadi kesalahan server.' });
+  }
+});
+
 
 
 app.listen(port, (req, res) => console.log(`berjalan di port ${port}`));
