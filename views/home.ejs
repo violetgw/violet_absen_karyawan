@@ -4,8 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <link rel="icon" href="favicon.ico?v=1.1">
+
     <style>
       /* Custom CSS */
+      body{
+/* For browsers that do not support gradients */
+
+  /* Menentukan warna gradient */
+  background-image: linear-gradient(to right, rgb(228, 100, 174), rgb(163, 95, 241));
+;
+      background-image: linear-gradient(to right, rgb(228, 100, 174) , rgb(163, 95, 241));
+    }
       .box-container {
         border: 1px solid #ccc;
         padding: 15px;
@@ -47,13 +57,13 @@
 <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
 
 <center>
-<i style="position: relative; top: 40px;" class="icon-user font-large-2 float-center "></i>
+<i style="position: relative; top: 40px; color: #ffffff;" class="icon-user font-large-2 float-center "></i>
 <div class="grey-bg container-fluid">
   <section id="minimal-statistics">
     <div class="row">
       <div class="col-12 mt-3 mb-1">
-        <h4 class="text-uppercase text-success"></i>Selamat Datang</h4>
-        <h4 class="text-uppercase text-info"></i><%= nama %></h4>
+        <h4 class="text-uppercase" style="color: #ffffff;"></i>Selamat Datang</h4>
+        <h4 class="text-uppercase" style="color: #ffffff;"></i><%= nama %></h4>
         <p>-MENU-</p>
       </div>
     </div>
@@ -82,8 +92,8 @@
             <div class="media">
               <i class="icon-note font-large-2"></i>
               <div class="media-body text-left">
-                <h3>Form Izin Sakit/tidak masuk/Cuti </h3>
-                <span>Tempat Izin Tidak Masuk kerja atau sakit dan cuti</span>
+                <h3>Form Izin</h3>
+                <span>form izin sakit dan cuti</span>
               </div>
             </div>
           </div>
@@ -96,10 +106,10 @@
           <div class="card">
             <div class="card-body">
               <div class="media">
-                <i class="icon-note font-large-2"></i>
+                <i class="icon-user-follow font-large-2 text-dark"></i>
                 <div class="media-body text-left">
-                  <h3>Buat Akun Karyawan </h3>
-                  <span>Buat Akun karyawan</span>
+                  <h3 class="text-dark">Buat Akun</h3>
+                  <span class="text-dark">Buat Akun karyawan</span>
                 </div>
               </div>
             </div>
@@ -111,10 +121,10 @@
           <div class="card">
             <div class="card-body">
               <div class="media">
-                <i class="icon-note font-large-2"></i>
+                <i class="icon-users font-large-2"></i>
                 <div class="media-body text-left">
-                  <h3>Data Akun Karyawan </h3>
-                  <span>Melihat Semua Data Akun Karyawan</span>
+                  <h3>Data Akun</h3>
+                  <span>Melihat Data Akun Karyawan</span>
                 </div>
               </div>
             </div>

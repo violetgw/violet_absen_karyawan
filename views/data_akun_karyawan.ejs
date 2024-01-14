@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <link rel="icon" href="favicon.ico?v=1.1">
 </head>
 <body>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -25,6 +26,10 @@
       </div>
     </div>
     <style>
+      body{
+        background-image: linear-gradient(to right, rgb(228, 100, 174) , rgb(163, 95, 241));
+
+      }
       /* Gaya CSS untuk notifikasi */
       .fixed-notification {
         position: fixed;
@@ -171,7 +176,10 @@
               </select>
             </div>
             <button type="button" class="btn btn-primary" onclick="updateData('<%= data_akun._id %>')">Save</button>
-            <button style="color: aliceblue;" type="button" class="btn btn-danger" onclick="Batal_Undang('<%= data_akun._id %>')">Batal Undang</button>
+            <button style="color: aliceblue;" type="button" class="btn btn-danger" onclick="Hapus('<%= data_akun._id %>')">Hapus Akun</button>
+            <% if(data_akun.jumlah_login === "1"){ %>
+            <button style="color: aliceblue;" type="button" id="reset_login_<%= data_akun._id %>" class="btn btn-warning" onclick="updateData('<%= data_akun._id %>')">Reset Login</button>
+          <%}%>
           </form>
         </div>
       </div>
@@ -182,11 +190,8 @@
       <h2>Tidak Ada Data Kontak Lagi</h2>
   </div>
   <span class="icon-tambah">
-    <a href="/pilih_upload" class="fa-solid fa-arrow-left"></a>
+    <a href="/home" class="fa-solid fa-arrow-left"></a>
   </span>
-      <span data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo" class="icon-back">
-        <i class="fa-solid fa-plus primary"></i>
-      </span>
 
       <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script crossorigin="anonymous">
@@ -201,49 +206,41 @@ window.addEventListener("load", function () {
     // You can replace the setTimeout with your actual loading logic here
   });
       // Fungsi untuk mengupdate data pengguna berdasarkan ID
-      function Batal_Undang(id_send_pandding) {
-        const notificationCard = document.getElementById('notification');
-        const showNotificationBtn = document.getElementById('showNotification');
-        const element = document.getElementById(id_send_pandding);
+      function Hapus(id_akun) {
+  const notificationCard = document.getElementById('notification');
+  const element = document.getElementById(id_akun);
 
+  // Objek data yang akan dikirimkan
+  const sendPandding = {
+          Hapus_akun:true
+  };
 
-
-        // Objek data yang akan dikirimkan
-        const Send_Pandding = {
-          status:"belum_siap_kirim"
-        };
-    
-        fetch(`/pandding_kirim/${id_send_pandding}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(Send_Pandding)
-        })
-        .then(response => response.json())
-        .then(() => {
-
+  fetch(`/hapus_akun/${id_akun}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(sendPandding)
+  })
+    .then(response => response.json())
+    .then(() => {
       element.remove();
-
-      notificationCard.innerHTML="behasil Batal Undangan";
-
+      notificationCard.innerHTML = "Berhasil Hapus Akun Karyawan";
       notificationCard.style.display = 'block';
-
       notificationCard.classList.add('show-notification');
 
       setTimeout(() => {
-
         notificationCard.classList.remove('show-notification');
 
         setTimeout(() => {
           notificationCard.style.display = 'none';
-        }, 500); 
+        }, 500);
       }, 2000);
     })
-        .catch(error => {
-          console.error('Terjadi kesalahan:', error);
-        });
-      }
+    .catch(error => {
+      console.error('Terjadi kesalahan:', error);
+    });
+}
 
 // batasnya ------------------------------------------------------------------
 
@@ -286,9 +283,9 @@ window.addEventListener("load", function () {
           password:password,
           nama:name,
           nik:nik,
-          nomer_telfon: phone,
+          nomer_telfon: phone.value,
           divisi: divisi,
-          lokasi_kerja:lokasi_kerja,
+          lokasi_kerja:role,
           jumlah_login:"0"
         };
     
@@ -301,9 +298,12 @@ window.addEventListener("load", function () {
         })
         .then(response => response.json())
         .then(() => {
+      const element = document.getElementById(`reset_login_${id_edit}`);
+      
+      element.remove();
 
       notificationCard.innerHTML="behasil Edit !";
-
+      
       notificationCard.style.display = 'block';
 
 
@@ -324,6 +324,7 @@ window.addEventListener("load", function () {
       }
 
 
+      
 
     </script>
     
