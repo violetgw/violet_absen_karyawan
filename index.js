@@ -160,6 +160,13 @@ app.get("/buat_akun_karyawan", (req, res) => {
   }
 });
 
+
+app.get("/", async (req, res) => {
+
+  res.render("welcome");
+});
+
+
 // data akun karyawana
 app.get("/data_akun_karyawan", async (req, res) => {
   if(req.session.status=="login" && req.session.divisi === "HRD"){
@@ -217,51 +224,66 @@ app.get("/scan_absen_pulang", (req, res) => {
 });
 
 app.get('/login', async (req, res) => {
-  if (req.session.status === "login") {
-  
-    res.redirect("/home");
-  //   const db_data = await kirim_akun_karyawan_violet.findOne({
-  //     username: req.session.username,
-  //     password: req.session.password,
-  //     nama: req.session.nama
-  //   }, 'username password nama nik divisi').exec();
-
-  //   if(db_data){
-  //     res.redirect("/home");
-
-  //   }
-  //   else{
-  //     res.redirect("/logout")
-  //   }
-  
-  // }
-  // else{
-  //   res.redirect("");
-   }
-  // else{
-  //   if (req.cookies.username && req.cookies.password) {
-  //     const db_data = await kirim_akun_karyawan_violet.findOne({
-  //       username: buka_enkripsi(req.cookies.username, secretKey),
-  //       password: buka_enkripsi(req.cookies.password, secretKey),
-  //       nama: buka_enkripsi(req.cookies.nama, secretKey)
-  //     }, 'username password nama nik divisi').exec();
-  
-  //     if (db_data) {
-  //       req.session.status="login"; 
-  //       res.redirect("/login");
-  //     }
-  //   }
-  //   else{
-  //     res.redirect("/login");
-  //   }
-  // }
 
   const { status_login } = req.query;
+  let status_login_ke_ejs;
+
   if (status_login) {
-    res.render('login', { statusnya: status_login });
+    status_login_ke_ejs = status_login;
   } else {
-    res.render("login", { statusnya: false });
+    status_login_ke_ejs = false;
   }
+
+
+  if (req.session.status === "login") {
+
+    const db_data = await kirim_akun_karyawan_violet.findOne({
+      username: req.session.username,
+      password: req.session.password,
+      nama: req.session.nama
+    }, 'username password nama nik divisi lokasi_kerja jumlah_login').exec();
+
+    if(db_data){
+      req.session.username = db_data.username;
+      req.session.password = db_data.password;
+      req.session.lokasi_kerja = db_data.lokasi_kerja;
+      req.session.nama = db_data.nama;
+      req.session.nik = db_data.nik;
+      req.session.divisi = db_data.divisi;
+      req.session.status= "login";
+      res.redirect("/home");
+
+    }
+    else{
+      res.redirect("/logout")
+    }
+  
+  }
+    else if(req.cookies.username && req.cookies.password) {
+      const db_data = await kirim_akun_karyawan_violet.findOne({
+        username: buka_enkripsi(req.cookies.username, secretKey),
+        password: buka_enkripsi(req.cookies.password, secretKey),
+        nama: buka_enkripsi(req.cookies.nama, secretKey)
+      }, 'username password nama nik divisi lokasi_kerja jumlah_login').exec();
+  
+      if (db_data) {
+        req.session.username = db_data.username;
+        req.session.password = db_data.password;
+        req.session.lokasi_kerja = db_data.lokasi_kerja;
+        req.session.nama = db_data.nama;
+        req.session.nik = db_data.nik;
+        req.session.divisi = db_data.divisi;
+        req.session.status= "login";
+        res.redirect("/home");
+      }
+    }
+    else{
+      res.render("login",{
+        statusnya:status_login_ke_ejs
+      });
+    }
+
+
 });
 
 
@@ -766,7 +788,7 @@ app.post("/proses_izin", async (req, res) => {
       range: "Sheet1!A:B",
       valueInputOption: "USER_ENTERED",
       resource: {
-       values: [[req.session.nama,`'${req.session.nik}`,req.session.lokasi_kerja,currentTime.format('YYYY-MM-DD'),`${pesan}`,currentTime.format('HH:mm:ss'),'',`${izin}`]],
+       values: [[req.session.nama,`'${req.session.nik}`,req.session.lokasi_kerja,currentTime.format('YYYY-MM-DD'),`${pesan}`,req.session.divisi,currentTime.format('HH:mm:ss'),``,`${izin}`]],
       },
     });
     console.log(`Data Absen yang ke data masuk`);

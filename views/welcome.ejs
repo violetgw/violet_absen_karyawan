@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome Page</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-image: linear-gradient(to right, rgb(228, 100, 174), rgb(163, 95, 241));
+      color: white;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      animation: fadeInUp 1.5s ease-out;
+    }
+
+    #joinButton {
+      background-color: #fff;
+      color: rgb(163, 95, 241);
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 20px;
+      animation: fadeInUp 2s ease-out;
+    }
+    .gabung{
+      animation: fadeInUp 2s ease-out;
+        color: white;
+        text-decoration: none;
+        position: relative;
+        padding: 10px 10px;
+        border-radius: 10px;
+        box-shadow: black;
+      background-image: linear-gradient(to right, rgb(228, 100, 174), rgb(163, 95, 241));
+
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <center>
+    <h1>Selamat datang di keluarga besar Violet</h1>
+    <a class="gabung" href="/login">Gabung?</a>
+</center>  
+</div>
+
+  <script>
+    // Tambahkan animasi tambahan jika diperlukan
+  </script>
+</body>
+</html>
