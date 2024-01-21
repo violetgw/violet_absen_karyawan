@@ -16,15 +16,17 @@ require('moment-timezone');
 moment.tz.setDefault('Asia/Jakarta');
 const port =3000;
 const bodyParser = require('body-parser');
-const path = require('path');
 const { resourceLimits } = require('worker_threads');
-
+const id_spreadsheets_asli ="1cpkSi_4mIZnyHFxq5ial4Yxh5YKOso4Y1XbCKbCUsog";
+const id_spreadsheets_testing ="1Jbf0LtbDXsDzdmODbnVMNrZncWJUSl3ebE4KfnJN0_M";
+const path = require('path');
 // Gunakan middleware body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 // client.on('qr', qr => {
@@ -160,6 +162,13 @@ app.get("/buat_akun_karyawan", (req, res) => {
   }
 });
 
+
+app.get("/", async (req, res) => {
+
+  res.render("welcome");
+});
+
+
 // data akun karyawana
 app.get("/data_akun_karyawan", async (req, res) => {
   if(req.session.status=="login" && req.session.divisi === "HRD"){
@@ -217,51 +226,69 @@ app.get("/scan_absen_pulang", (req, res) => {
 });
 
 app.get('/login', async (req, res) => {
-  if (req.session.status === "login") {
-  
-    res.redirect("/home");
-  //   const db_data = await kirim_akun_karyawan_violet.findOne({
-  //     username: req.session.username,
-  //     password: req.session.password,
-  //     nama: req.session.nama
-  //   }, 'username password nama nik divisi').exec();
-
-  //   if(db_data){
-  //     res.redirect("/home");
-
-  //   }
-  //   else{
-  //     res.redirect("/logout")
-  //   }
-  
-  // }
-  // else{
-  //   res.redirect("");
-   }
-  // else{
-  //   if (req.cookies.username && req.cookies.password) {
-  //     const db_data = await kirim_akun_karyawan_violet.findOne({
-  //       username: buka_enkripsi(req.cookies.username, secretKey),
-  //       password: buka_enkripsi(req.cookies.password, secretKey),
-  //       nama: buka_enkripsi(req.cookies.nama, secretKey)
-  //     }, 'username password nama nik divisi').exec();
-  
-  //     if (db_data) {
-  //       req.session.status="login"; 
-  //       res.redirect("/login");
-  //     }
-  //   }
-  //   else{
-  //     res.redirect("/login");
-  //   }
-  // }
 
   const { status_login } = req.query;
+  let status_login_ke_ejs;
+
   if (status_login) {
-    res.render('login', { statusnya: status_login });
+    status_login_ke_ejs = status_login;
   } else {
-    res.render("login", { statusnya: false });
+    status_login_ke_ejs = false;
   }
+
+
+  if (req.session.status === "login") {
+
+    const db_data = await kirim_akun_karyawan_violet.findOne({
+      username: req.session.username,
+      password: req.session.password,
+      nama: req.session.nama
+    }, 'username password nama nik divisi lokasi_kerja jumlah_login').exec();
+
+    if(db_data){
+      req.session.username = db_data.username;
+      req.session.password = db_data.password;
+      req.session.lokasi_kerja = db_data.lokasi_kerja;
+      req.session.nama = db_data.nama;
+      req.session.nik = db_data.nik;
+      req.session.divisi = db_data.divisi;
+      req.session.status= "login";
+      res.redirect("/home");
+
+    }
+    else{
+      res.redirect("/logout")
+    }
+  
+  }
+    else if(req.cookies.username && req.cookies.password) {
+      const db_data = await kirim_akun_karyawan_violet.findOne({
+        username: buka_enkripsi(req.cookies.username, secretKey),
+        password: buka_enkripsi(req.cookies.password, secretKey),
+        nama: buka_enkripsi(req.cookies.nama, secretKey)
+      }, 'username password nama nik divisi lokasi_kerja jumlah_login').exec();
+  
+      if (db_data) {
+        req.session.username = db_data.username;
+        req.session.password = db_data.password;
+        req.session.lokasi_kerja = db_data.lokasi_kerja;
+        req.session.nama = db_data.nama;
+        req.session.nik = db_data.nik;
+        req.session.divisi = db_data.divisi;
+        req.session.status= "login";
+        res.redirect("/home");
+      }
+      else{
+        res.redirect("/logout");
+      }
+    }
+    else{
+      res.render("login",{
+        statusnya:status_login_ke_ejs
+      });
+    }
+
+
 });
 
 
@@ -385,7 +412,7 @@ app.get("/pilih_absen", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = "1Jbf0LtbDXsDzdmODbnVMNrZncWJUSl3ebE4KfnJN0_M";
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -448,7 +475,7 @@ if(req.session.status=="login"){
  // Instance of Google Sheets API
  const googleSheets = google.sheets({ version: "v4", auth: client });
 
- const spreadsheetId = "1Jbf0LtbDXsDzdmODbnVMNrZncWJUSl3ebE4KfnJN0_M";
+ const spreadsheetId = id_spreadsheets_testing;
 
  // Get metadata about spreadsheet
  const metaData = await googleSheets.spreadsheets.get({
@@ -502,7 +529,7 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = "1Jbf0LtbDXsDzdmODbnVMNrZncWJUSl3ebE4KfnJN0_M";
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:I";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -692,7 +719,7 @@ app.get('/form_izin', async (req,res)=>{
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = "1Jbf0LtbDXsDzdmODbnVMNrZncWJUSl3ebE4KfnJN0_M";
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -744,7 +771,7 @@ app.post("/proses_izin", async (req, res) => {
     // Instance of Google Sheets API
     const googleSheets = google.sheets({ version: "v4", auth: client });
    
-    const spreadsheetId = "1Jbf0LtbDXsDzdmODbnVMNrZncWJUSl3ebE4KfnJN0_M";
+    const spreadsheetId = id_spreadsheets_testing;
    
     // Get metadata about spreadsheet
     const metaData = await googleSheets.spreadsheets.get({
@@ -766,7 +793,7 @@ app.post("/proses_izin", async (req, res) => {
       range: "Sheet1!A:B",
       valueInputOption: "USER_ENTERED",
       resource: {
-       values: [[req.session.nama,`'${req.session.nik}`,req.session.lokasi_kerja,currentTime.format('YYYY-MM-DD'),`${pesan}`,currentTime.format('HH:mm:ss'),'',`${izin}`]],
+       values: [[req.session.nama,`'${req.session.nik}`,req.session.lokasi_kerja,currentTime.format('YYYY-MM-DD'),`${pesan}`,req.session.divisi,currentTime.format('HH:mm:ss'),``,`${izin}`]],
       },
     });
     console.log(`Data Absen yang ke data masuk`);

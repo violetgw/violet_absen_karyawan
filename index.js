@@ -1,4 +1,7 @@
-  var favicon = require('serve-favicon')
+const qrcode = require('qrcode-terminal');
+const { Client } = require('whatsapp-web.js');
+const client = new Client();
+var favicon = require('serve-favicon')
 const express = require("express");
 const { google } = require("googleapis");
 const mongoose = require('mongoose');
@@ -13,29 +16,31 @@ require('moment-timezone');
 moment.tz.setDefault('Asia/Jakarta');
 const port =3000;
 const bodyParser = require('body-parser');
-const path = require('path');
 const { resourceLimits } = require('worker_threads');
 const id_spreadsheets_asli ="1cpkSi_4mIZnyHFxq5ial4Yxh5YKOso4Y1XbCKbCUsog";
 const id_spreadsheets_testing ="1Jbf0LtbDXsDzdmODbnVMNrZncWJUSl3ebE4KfnJN0_M";
+const path = require('path');
 // Gunakan middleware body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
+app.use(express.static(path.join(__dirname, 'public')));
 
-// client.on('qr', qr => {
-//   qrcode.generate(qr, { small: true });
-// });
+async function sendMessage(chatId, message) {
+  return await client.sendMessage(chatId, message);
+}
 
-// client.on('ready', () => {
-//   console.log('Client is ready!');
-// });
+client.on('qr', qr => {
+  qrcode.generate(qr, { small: true });
+});
 
+// Event saat klien siap
+client.on('ready', () => {
+  console.log('Client is ready!');
+});
 
-
-// client.initialize();
 
 
 // Gunakan cookie-parser sebagai middleware
@@ -239,7 +244,7 @@ app.get('/login', async (req, res) => {
       username: req.session.username,
       password: req.session.password,
       nama: req.session.nama
-    }, 'username password nama nik divisi lokasi_kerja jumlah_login').exec();
+    }, 'username password nama nik divisi lokasi_kerja jumlah_login nomer_telfon').exec();
 
     if(db_data){
       req.session.username = db_data.username;
@@ -248,6 +253,7 @@ app.get('/login', async (req, res) => {
       req.session.nama = db_data.nama;
       req.session.nik = db_data.nik;
       req.session.divisi = db_data.divisi;
+      req.session.nomer_telfon = db_data.nomer_telfon;
       req.session.status= "login";
       res.redirect("/home");
 
@@ -262,7 +268,7 @@ app.get('/login', async (req, res) => {
         username: buka_enkripsi(req.cookies.username, secretKey),
         password: buka_enkripsi(req.cookies.password, secretKey),
         nama: buka_enkripsi(req.cookies.nama, secretKey)
-      }, 'username password nama nik divisi lokasi_kerja jumlah_login').exec();
+      }, 'username password nama nik divisi lokasi_kerja jumlah_login nomer_telfon').exec();
   
       if (db_data) {
         req.session.username = db_data.username;
@@ -271,6 +277,7 @@ app.get('/login', async (req, res) => {
         req.session.nama = db_data.nama;
         req.session.nik = db_data.nik;
         req.session.divisi = db_data.divisi;
+        req.session.nomer_telfon = db_data.nomer_telfon;
         req.session.status= "login";
         res.redirect("/home");
       }
@@ -292,7 +299,7 @@ app.get('/login', async (req, res) => {
 app.post('/login/proses_login', async (req, res) => {
   const { username, password } = req.body;
 
-    const db_data = await kirim_akun_karyawan_violet.findOne({username:username,password:password},'username password nama nik divisi lokasi_kerja jumlah_login').exec();
+    const db_data = await kirim_akun_karyawan_violet.findOne({username:username,password:password},'username password nama nik divisi lokasi_kerja jumlah_login nomer_telfon').exec();
     if (db_data && db_data.divisi == "HRD" ) {
       res.cookie('username',enkripsi(db_data.username, secretKey), {expires: expirationDate,httpOnly: true});
       res.cookie('password',enkripsi(db_data.password, secretKey), {expires: expirationDate,httpOnly: true});
@@ -309,9 +316,18 @@ app.post('/login/proses_login', async (req, res) => {
       req.session.nama = db_data.nama;
       req.session.nik = db_data.nik;
       req.session.divisi = db_data.divisi;
+      req.session.nomer_telfon = db_data.nomer_telfon;
       req.session.status= "login";
-    
-      res.redirect('/home');
+      const number = `+62${req.session.nomer_telfon}`;
+      const text = `Anda Berhasil Login! *${req.session.nama}* hubungi HRD jika anda tidak merasa Login dan anda hanya bisa login sekali!`;
+      const chatId = `${number.substring(1)}@c.us`;
+      try {
+       await sendMessage(chatId, text);
+       res.redirect("/home");
+     } catch (error) {
+       console.error('Error sending message:', error);
+       res.redirect("/home");
+     }
     }
 
   else if (db_data && db_data.jumlah_login == "0" ) {
@@ -330,6 +346,7 @@ app.post('/login/proses_login', async (req, res) => {
   req.session.nama = db_data.nama;
   req.session.nik = db_data.nik;
   req.session.divisi = db_data.divisi;
+  req.session.nomer_telfon = db_data.nomer_telfon;
   req.session.status= "login";
 
   kirim_akun_karyawan_violet.findOneAndUpdate(
@@ -349,7 +366,16 @@ app.post('/login/proses_login', async (req, res) => {
     });
 
 
-  res.redirect('/home');
+    const number = `+62${req.session.nomer_telfon}`;
+    const text = `Anda Berhasil Login! ${req.session.nama} hubungi HRD jika anda tidak merasa Login dan anda hanya bisa login sekali!`;
+    const chatId = `${number.substring(1)}@c.us`;
+    try {
+     await sendMessage(chatId, text);
+     res.redirect("/home");
+   } catch (error) {
+     console.error('Error sending message:', error);
+     res.redirect("/home");
+   }
 }
 else if( db_data && db_data.jumlah_login==="1"){
   res.redirect('/login?status_login=sudah login sekali tolong hubungi HRD atau Developer untuk mereset ulang login');
@@ -408,7 +434,7 @@ app.get("/pilih_absen", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_testing;
+    const spreadsheetId = id_spreadsheets_asli;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -471,7 +497,7 @@ if(req.session.status=="login"){
  // Instance of Google Sheets API
  const googleSheets = google.sheets({ version: "v4", auth: client });
 
- const spreadsheetId = id_spreadsheets_testing;
+ const spreadsheetId = id_spreadsheets_asli;
 
  // Get metadata about spreadsheet
  const metaData = await googleSheets.spreadsheets.get({
@@ -503,7 +529,19 @@ if(req.session.status=="login"){
  console.log(`divisi = ${req.session.divisi}`);
  console.log(`lokasi = ${lokasi}`);
  console.log(`lokasi kerja = ${req.session.lokasi_kerja}`);
- res.redirect("/sukses_absen");
+
+ // untuk wa
+ const number = `+62${req.session.nomer_telfon}`;
+ const text = `Anda Berhasil Absen Masuk! *${req.session.nama}* hubungi HRD jika anda tidak merasa absen`;
+ const chatId = `${number.substring(1)}@c.us`;
+ try {
+  await sendMessage(chatId, text);
+  res.redirect("/sukses_absen");
+} catch (error) {
+  console.error('Error sending message:', error);
+  res.redirect("/sukses_absen");
+}
+
  
 }
 else{
@@ -525,7 +563,7 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_testing;
+    const spreadsheetId = id_spreadsheets_asli;
     const range = "Sheet1!A:I";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -581,7 +619,17 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
       console.log(`lokasi = ${lokasi}`);
       console.log(`lokasi kerja = ${req.session.lokasi_kerja}`);
 
-      res.redirect("/sukses_absen");
+      // kirim ke wa
+      const number = `+62${req.session.nomer_telfon}`;
+      const text = `Anda Berhasil Absen Pulang! *${req.session.nama}* hubungi HRD jika anda tidak merasa absen`;
+      const chatId = `${number.substring(1)}@c.us`;
+      try {
+       await sendMessage(chatId, text);
+       res.redirect("/sukses_absen");
+     } catch (error) {
+       console.error('Error sending message:', error);
+       res.redirect("/sukses_absen");
+     }
     } else {
       console.log('Data tidak ditemukan untuk session.nik tertentu.');
       return res.redirect("/login");
@@ -715,7 +763,7 @@ app.get('/form_izin', async (req,res)=>{
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_testing;
+    const spreadsheetId = id_spreadsheets_asli;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -767,7 +815,7 @@ app.post("/proses_izin", async (req, res) => {
     // Instance of Google Sheets API
     const googleSheets = google.sheets({ version: "v4", auth: client });
    
-    const spreadsheetId = id_spreadsheets_testing;
+    const spreadsheetId = id_spreadsheets_asli;
    
     // Get metadata about spreadsheet
     const metaData = await googleSheets.spreadsheets.get({
@@ -807,6 +855,6 @@ app.post("/proses_izin", async (req, res) => {
     res.redirect("/login");
   }
 });
-
+client.initialize();
 app.listen(port, (req, res) => console.log(`berjalan di port ${port}`));
 

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Welcome Page</title>
   <style>
+    
     body {
       margin: 0;
       padding: 0;
@@ -12,38 +13,36 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
-      background-image: linear-gradient(to right, rgb(228, 100, 174), rgb(163, 95, 241));
+      background-image: url('/img/foto_welcome.jpg'); /* Ganti 'link_gambar_background.jpg' dengan URL gambar latar belakang Anda */
+      background-size: cover;
+      background-position: center;
       color: white;
       font-family: 'Arial', sans-serif;
       overflow: hidden;
     }
 
-    h1 {
+    #welcomeContainer {
       text-align: center;
       animation: fadeInUp 1.5s ease-out;
     }
 
-    #joinButton {
-      background-color: #fff;
-      color: rgb(163, 95, 241);
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-      margin-top: 20px;
-      animation: fadeInUp 2s ease-out;
+    h1 {
+      margin-bottom: 20px;
     }
-    .gabung{
-      animation: fadeInUp 2s ease-out;
-        color: white;
-        text-decoration: none;
-        position: relative;
-        padding: 10px 10px;
-        border-radius: 10px;
-        box-shadow: black;
-      background-image: linear-gradient(to right, rgb(228, 100, 174), rgb(163, 95, 241));
 
+    .gabung {
+      display: inline-block;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      background-image: linear-gradient(to right, rgb(228, 100, 174), rgb(163, 95, 241));
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-image 0.3s ease-out;
+    }
+
+    .gabung:hover {
+      background-image: linear-gradient(to right, rgb(163, 95, 241), rgb(228, 100, 174));
     }
 
     @keyframes fadeInUp {
@@ -59,12 +58,10 @@
   </style>
 </head>
 <body>
-  <div>
-    <center>
+  <div id="welcomeContainer">
     <h1>Selamat datang di keluarga besar Violet</h1>
     <a class="gabung" href="/login">Gabung?</a>
-</center>  
-</div>
+  </div>
 
   <script>
     // Tambahkan animasi tambahan jika diperlukan
