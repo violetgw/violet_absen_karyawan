@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Scan pulang</title>
   <link rel="icon" href="favicon.ico?v=1.1">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js" integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
@@ -17,6 +17,14 @@
       text-decoration: none;
       padding: 10px;
       background-color: purple;
+    }
+    button{
+      margin: 40px;
+      height: 50px;
+      width: 300px;
+      border: none;
+      background-color: aquamarine;
+      position: relative;
     }
 
     /* The Modal (background) */
@@ -57,6 +65,81 @@
       text-decoration: none;
       cursor: pointer;
     }
+
+    /* untuk moda */
+
+    /* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+  color: white;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-header {
+  padding: 2px 16px;
+  background-color: #5cb85c;
+  color: white;
+}
+
+.modal-body {
+  padding: 2px 16px;
+  height: 150px;
+}
+
+.modal-footer {
+  padding: 2px 16px;
+  background-color: #5cb85c;
+  color: white;
+}
     </style>
 </head>
 <body>
@@ -64,45 +147,108 @@
   
 <div style="position: absolute;" id="qr-reader"></div>
 
+<div id="myModal" class="modal">
 
-<script>
-  function onScanSuccess(decodedText, decodedResult) {
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close">&times;</span>
+      <h2 id="h2_absen">Ingin Absen?</h2>
+    </div>
+    <div class="modal-body">
+      <p id="p_absen">Lanjutkan jika anda ingin absen</p>
+      <center>
+      <button id="tombol_absen_ya" style="position: relative; width: 50%;">Iya!</button>
+    </center>
+    </div>
+  </div>
 
-    const contoh=decodedText;
-    if(contoh=="https://me-qr.com/lTNdh2HG"){
-      // tutup_scan();
-          if (confirm("apakah anda ingi absen?")) {
-            location="data_absen_pulang_karyawan?lokasi=Kantor Grand wisata";
-    } else {
-      txt = "You pressed Cancel!";
-    }
-    }
-    //untuk zamrud
-    else if(contoh=="https://me-qr.com/IiwsApPD"){
-      // tutup_scan();
-      if (confirm("apakah anda ingin absen")) {
-        location="data_absen_pulang_karyawan?lokasi=zamrud";
+
+  <script>
+    function onScanSuccess(decodedText, decodedResult) {
+      const contoh = decodedText;
+      if (contoh == "https://me-qr.com/lTNdh2HG") {
+        buka_modal("Grand Wisata");
+      } else if (contoh == "https://me-qr.com/IiwsApPD") {
+        buka_modal("Zamrud");
+      } else if (contoh == "https://me-qr.com/sashmira") {
+        buka_modal("sahmira");
+      } else if (contoh == "https://me-qr.com/blokf") {
+        buka_modal("blokf");
+      } else if (contoh == "https://me-qr.com/MutiaraGadingTimur") {
+        buka_modal("Mutiara Gading Timur");
+      }else if (contoh == "https://me-qr.com/setu") {
+        buka_modal("Setu");
+      }else if (contoh == "https://me-qr.com/konveksi") {
+        buka_modal("Konveksi");
       } else {
-      txt = "You pressed Cancel!";
-        }
+        alert(`Ini bukan absen Violet!!!! ${decodedText}`);
+      }
     }
-    else{
-      // conosle.log(decodedText);
-      alert(`ini bukan absen Violet!!!!${decodedText}`)
+  
+    var html5QrcodeScanner = new Html5QrcodeScanner(
+      "qr-reader",
+      { fps: 10, qrbox: 250, cameraScanImage: './path/to/camera-scan.gif' }
+    );
+  
+    html5QrcodeScanner.render(onScanSuccess);
+  
+    function tutup_scan() {
+      document.getElementById("qr-reader").style.display = "none";
     }
-  }
+  
 
-  var html5QrcodeScanner = new Html5QrcodeScanner(
-    "qr-reader", { fps: 10, qrbox: 250, cameraScanImage: './path/to/camera-scan.gif' }
-  );
 
-  html5QrcodeScanner.render(onScanSuccess);
 
-function tutup_scan(){
-  document.getElementById("qr-reader").style.display = "none";
-}
+  // untuk modal 
 
-</script>
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("myBtn");
+  
+    // Get the modal element
+    var modal = document.getElementById("myModal");
+  
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // get lokasi
+  
+    // When the user clicks the button, open the modal 
+    function buka_modal(lokasi) {
+      document.getElementById("qr-reader").style.display = "none";
+      var h2_absen = document.getElementById("h2_absen");
+      var p_absen = document.getElementById("p_absen");
+      modal.style.display = "block";
+      var tombol_absen_ya = document.getElementById("tombol_absen_ya");
+      h2_absen.textContent=`Ingin Absen pulang ${lokasi}?`;
+      p_absen.textContent=`pencet ya jika ingin Absen pulang di ${lokasi}`;
+
+
+      tombol_absen_ya.onclick = function(){
+        tombol_absen_ya.style.display="none";
+        h2_absen.textContent=`sedang loading`;
+        p_absen.textContent=`tunggu sebentar`;
+        location =`data_absen_pulang_karyawan?lokasi=${lokasi}`;
+      }
+
+    }
+  
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+      modal.style.display = "none";
+      document.getElementById("qr-reader").style.display = "block";
+    }
+  
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+        document.getElementById("qr-reader").style.display = "block";
+      }
+    }
+  </script>
+  
 
 
 
