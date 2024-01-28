@@ -412,7 +412,7 @@ app.get("/pilih_absen", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -475,7 +475,7 @@ if(req.session.status=="login"){
  // Instance of Google Sheets API
  const googleSheets = google.sheets({ version: "v4", auth: client });
 
- const spreadsheetId = id_spreadsheets_asli;
+ const spreadsheetId = id_spreadsheets_testing;
 
  // Get metadata about spreadsheet
  const metaData = await googleSheets.spreadsheets.get({
@@ -529,7 +529,7 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:I";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -719,7 +719,7 @@ app.get('/form_izin', async (req,res)=>{
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -771,7 +771,7 @@ app.post("/proses_izin", async (req, res) => {
     // Instance of Google Sheets API
     const googleSheets = google.sheets({ version: "v4", auth: client });
    
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
    
     // Get metadata about spreadsheet
     const metaData = await googleSheets.spreadsheets.get({

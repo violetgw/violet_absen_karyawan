@@ -36,6 +36,10 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
+// fungsi untuk wa
+
 async function sendMessage(chatId, message) {
   return await client.sendMessage(chatId, message);
 }
@@ -209,7 +213,7 @@ app.get("/sukses_absen", (req, res) => {
     status_login:req.session.status
   });
   }else {
-    res.rendirect("login")
+    res.redirect("login")
   }
 });
 
@@ -442,7 +446,7 @@ app.get("/pilih_absen", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -505,7 +509,7 @@ if(req.session.status=="login"){
  // Instance of Google Sheets API
  const googleSheets = google.sheets({ version: "v4", auth: client });
 
- const spreadsheetId = id_spreadsheets_asli;
+ const spreadsheetId = id_spreadsheets_testing;
 
  // Get metadata about spreadsheet
  const metaData = await googleSheets.spreadsheets.get({
@@ -571,7 +575,7 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:I";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -771,7 +775,7 @@ app.get('/form_izin', async (req,res)=>{
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -823,7 +827,7 @@ app.post("/proses_izin", async (req, res) => {
     // Instance of Google Sheets API
     const googleSheets = google.sheets({ version: "v4", auth: client });
    
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
    
     // Get metadata about spreadsheet
     const metaData = await googleSheets.spreadsheets.get({
@@ -863,6 +867,60 @@ app.post("/proses_izin", async (req, res) => {
     res.redirect("/login");
   }
 });
+// untuk perintah get dan post
+app.get("/data_absen", async (req, res) => {
+  const auth = new google.auth.GoogleAuth({
+    keyFile: "credentials.json",
+    scopes: "https://www.googleapis.com/auth/spreadsheets",
+  });
+
+  // ... (kode lainnya)
+
+  const sheets = google.sheets('v4');
+  const spreadsheetId = id_spreadsheets_testing;
+  const range = "Sheet1!A:H";
+
+  try {
+    const { data } = await sheets.spreadsheets.values.get({
+      auth,
+      spreadsheetId,
+      range,
+    });
+
+    const values = data.values;
+
+    if (values && values.length) {
+      // Mencari semua baris dengan nama "moza achmad dani"
+      const targetName = "moza achmad dani";
+      const filteredRows = values.filter(row => row[0] === targetName);
+
+      if (filteredRows.length > 0) {
+        // Menyiapkan data untuk dirender
+        const renderedData = filteredRows.map(row => row.slice(1).join(', '));
+
+        // Melewatkan data ke template dan merender halaman
+        res.render("data_absen", {
+          nama:req.session.nama,
+          data: renderedData
+         });
+      } else {
+        res.render("data_absen", {
+           nama:req.session.nama,
+           dataNotFound: true 
+          });
+      }
+    } else {
+      res.render("data_absen", {
+        noData: true 
+      });
+    }
+  } catch (error) {
+    console.error("Error retrieving data:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
 client.initialize();
 app.listen(port, (req, res) => console.log(`berjalan di port ${port}`));
 
