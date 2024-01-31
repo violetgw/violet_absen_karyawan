@@ -30,6 +30,10 @@
         background-image: linear-gradient(to right, rgb(228, 100, 174) , rgb(163, 95, 241));
 
       }
+
+      button{
+            background-image: linear-gradient(to right, rgb(228, 100, 174) , rgb(163, 95, 241));
+        }
       /* Gaya CSS untuk notifikasi */
       .fixed-notification {
         position: fixed;
@@ -106,11 +110,21 @@
     animation: spin 2s linear infinite;
     margin: 0 auto 10px;
   }
-
+  .card-body{
+  overflow-x: auto;
+  white-space: nowrap;
+}
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
+  select {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            width: 100%;
+        }
     </style>
 
 <div class="overlay">
@@ -133,6 +147,15 @@
         </div>
         <div class="card-body">
 
+
+          <%               
+          
+          if(data === true){ 
+          
+          
+          %>
+
+          <a href="/data_absen">Cari Bulan Lain</a>
           <table class="table">
             <thead>
               <tr>
@@ -140,27 +163,91 @@
                 <th scope="col">Nama</th>
                 <th scope="col">tanggal masuk</th>
                 <th scope="col">lokasi absen</th>
-                <th scope="col">divisi</th>
+                <th scope="col">Jabatan</th>
                 <th scope="col">jam masuk</th>
                 <th scope="col">jam pulang</th>
                 <th scope="col">shift</th>
               </tr>
             </thead>
             <tbody>
-              <% data.forEach(data_absen => { %>
+              <%
+
+              var no = 1 ;
+
+              rekap_absen.forEach(data_absen => { 
+                
+              %>
               <tr>
-                <th scope="row">1</th>
-                <td><%= data_absen %></td>
-                <td>Otto</td>
-                <td>@mdo</td>
-                <td>@mdo</td>
-                <td>@mdo</td>
-                <td>@mdo</td>
-                <td>@mdo</td>
+                <th scope="row"><%= no++ %></th>
+                <td><%= data_absen[0] %></td>
+                <td><%= data_absen[3] %></td>
+                <td><%= data_absen[4] %></td>
+                <td><%= data_absen[5] %></td>
+                <td><%= data_absen[6] %></td>
+                <td><%= data_absen[7] %></td>
+                <td><%= data_absen[8] %></td>
               </tr>
-              <% }); %>
+              <% 
+            
+            }); %>
             </tbody>
           </table>
+          <% 
+        
+        } 
+        else if(bulan===false){
+          %>
+          <p style="color:red;">Data Tidak Ada</p>
+          <h2>pilih tanggal</h2>
+          <form method="get" action="/data_absen">
+          <div class="mb-3">
+                    <select name="tanggal" id="tanggal" class="form-select" required>
+                        <option value="">Bulan?</option>
+                        <option value="Januari">Januari</option>
+                        <option value="Februari">Februari</option>
+                        <option value="Maret">Maret</option>
+                        <option value="April">April</option>
+                        <option value="Mei">Mei</option>
+                        <option value="Juni">Juni</option>
+                        <option value="Juli">Juli</option>
+                        <option value="Agustus">Agustus</option>
+                        <option value="September">September</option>
+                        <option value="Oktober">Oktober</option>
+                        <option value="November">November</option>
+                        <option value="Desember">Desember</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Cari</button> 
+              </form>
+            <%
+        }
+        else{  
+          
+          %>
+
+
+          <h2>pilih tanggal</h2>
+          <form method="get" action="/data_absen">
+          <div class="mb-3">
+                    <select name="tanggal" id="tanggal" class="form-select" required>
+                        <option value="">Bulan?</option>
+                        <option value="Januari">Januari</option>
+                        <option value="Februari">Februari</option>
+                        <option value="Maret">Maret</option>
+                        <option value="April">April</option>
+                        <option value="Mei">Mei</option>
+                        <option value="Juni">Juni</option>
+                        <option value="Juli">Juli</option>
+                        <option value="Agustus">Agustus</option>
+                        <option value="September">September</option>
+                        <option value="Oktober">Oktober</option>
+                        <option value="November">November</option>
+                        <option value="Desember">Desember</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Cari</button> 
+              </form>
+          <%}%>
         </div>
       </div>
     </div>
@@ -194,5 +281,16 @@
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
     
+    <script>
+
+fetch('https://api.myip.com/', { mode: 'no-cors' })
+  .then(response => {
+    console.log('Permintaan berhasil, tetapi tidak dapat mengakses respons langsung karena mode no-cors.');
+  })
+  .catch(error => {
+    console.error('Error:', error.message);
+  });
+
+    </script>
 </body>
 </html>

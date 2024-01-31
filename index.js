@@ -28,6 +28,7 @@ const { resourceLimits } = require('worker_threads');
 const id_spreadsheets_asli ="1cpkSi_4mIZnyHFxq5ial4Yxh5YKOso4Y1XbCKbCUsog";
 const id_spreadsheets_testing ="1Jbf0LtbDXsDzdmODbnVMNrZncWJUSl3ebE4KfnJN0_M";
 const path = require('path');
+const { error } = require('console');
 // Gunakan middleware body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -44,9 +45,9 @@ async function sendMessage(chatId, message) {
   return await client.sendMessage(chatId, message);
 }
 
-client.on('qr', qr => {
-  qrcode.generate(qr, { small: true });
-});
+// client.on('qr', qr => {
+//   qrcode.generate(qr, { small: true });
+// });
 
 // Event saat klien siap
 client.on('ready', () => {
@@ -330,16 +331,19 @@ app.post('/login/proses_login', async (req, res) => {
       req.session.divisi = db_data.divisi;
       req.session.nomer_telfon = db_data.nomer_telfon;
       req.session.status= "login";
-      const number = `+62${req.session.nomer_telfon}`;
-      const text = `Anda Berhasil Login! *${req.session.nama}* hubungi HRD jika anda tidak merasa Login dan anda hanya bisa login sekali!`;
-      const chatId = `${number.substring(1)}@c.us`;
-      try {
-       await sendMessage(chatId, text);
-       res.redirect("/home");
-     } catch (error) {
-       console.error('Error sending message:', error);
-       res.redirect("/home");
-     }
+
+      // ni untuk wa
+    //   try {
+    //     const number = `+62${req.session.nomer_telfon}`;
+    //     const text = `Anda Berhasil Login! *${req.session.nama}* hubungi HRD jika anda tidak merasa Login dan anda hanya bisa login sekali!`;
+    //     const chatId = `${number.substring(1)}@c.us`;
+    //    await sendMessage(chatId, text);
+    //    res.redirect("/home");
+    //  } catch (error) {
+    //    console.error('Error sending message:', error);
+    //    res.redirect("/home");
+    //  }
+    res.redirect("/home");
     }
 
   else if (db_data && db_data.jumlah_login == "0" ) {
@@ -378,10 +382,10 @@ app.post('/login/proses_login', async (req, res) => {
     });
 
 
-    const number = `+62${req.session.nomer_telfon}`;
-    const text = `Anda Berhasil Login! ${req.session.nama} hubungi HRD jika anda tidak merasa Login dan anda hanya bisa login sekali!`;
-    const chatId = `${number.substring(1)}@c.us`;
     try {
+      const number = `+62${req.session.nomer_telfon}`;
+      const text = `Anda Berhasil Login! ${req.session.nama} hubungi HRD jika anda tidak merasa Login dan anda hanya bisa login sekali!`;
+      const chatId = `${number.substring(1)}@c.us`;
      await sendMessage(chatId, text);
      res.redirect("/home");
    } catch (error) {
@@ -446,7 +450,7 @@ app.get("/pilih_absen", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_testing;
+    const spreadsheetId = id_spreadsheets_asli;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -509,7 +513,7 @@ if(req.session.status=="login"){
  // Instance of Google Sheets API
  const googleSheets = google.sheets({ version: "v4", auth: client });
 
- const spreadsheetId = id_spreadsheets_testing;
+ const spreadsheetId = id_spreadsheets_asli;
 
  // Get metadata about spreadsheet
  const metaData = await googleSheets.spreadsheets.get({
@@ -542,17 +546,18 @@ if(req.session.status=="login"){
  console.log(`lokasi = ${lokasi}`);
  console.log(`lokasi kerja = ${req.session.lokasi_kerja}`);
 
- // untuk wa
- const number = `+62${req.session.nomer_telfon}`;
- const text = `Anda Berhasil Absen Masuk! *${req.session.nama}* hubungi HRD jika anda tidak merasa absen`;
- const chatId = `${number.substring(1)}@c.us`;
- try {
-  await sendMessage(chatId, text);
-  res.redirect("/sukses_absen");
-} catch (error) {
-  console.error('Error sending message:', error);
-  res.redirect("/sukses_absen");
-}
+//  try {
+//    // untuk wa
+//  const number = `+62${req.session.nomer_telfon}`;
+//  const text = `Anda Berhasil Absen Masuk! *${req.session.nama}* hubungi HRD jika anda tidak merasa absen`;
+//  const chatId = `${number.substring(1)}@c.us`;
+//   await sendMessage(chatId, text);
+//   res.redirect("/sukses_absen");
+// } catch (error) {
+//   console.error('Error sending message:', error);
+//   res.redirect("/sukses_absen");
+// }
+ res.redirect("/sukses_absen");
 
  
 }
@@ -575,7 +580,7 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_testing;
+    const spreadsheetId = id_spreadsheets_asli;
     const range = "Sheet1!A:I";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -631,17 +636,19 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
       console.log(`lokasi = ${lokasi}`);
       console.log(`lokasi kerja = ${req.session.lokasi_kerja}`);
 
-      // kirim ke wa
-      const number = `+62${req.session.nomer_telfon}`;
-      const text = `Anda Berhasil Absen Pulang! *${req.session.nama}* hubungi HRD jika anda tidak merasa absen`;
-      const chatId = `${number.substring(1)}@c.us`;
-      try {
-       await sendMessage(chatId, text);
-       res.redirect("/sukses_absen");
-     } catch (error) {
-       console.error('Error sending message:', error);
-       res.redirect("/sukses_absen");
-     }
+    //   try {
+    //     // kirim ke wa
+    //     const number = `+62${req.session.nomer_telfon}`;
+    //     const text = `Anda Berhasil Absen Pulang! *${req.session.nama}* hubungi HRD jika anda tidak merasa absen`;
+    //     const chatId = `${number.substring(1)}@c.us`;
+    //    await sendMessage(chatId, text);
+    //    res.redirect("/sukses_absen");
+    //  } catch (error) {
+    //    console.error('Error sending message:', error);
+    //    res.redirect("/sukses_absen");
+    //  }
+     res.redirect("/sukses_absen");
+
     } else {
       console.log('Data tidak ditemukan untuk session.nik tertentu.');
       return res.redirect("/login");
@@ -706,6 +713,7 @@ app.post("/proses_buat_akun_karyawan", async (req, res) => {
       });
     }
     else{
+
       input_akun_karyawan_violet.save();
       console.log(`${username}`);
       console.log(`${password}`);
@@ -714,6 +722,37 @@ app.post("/proses_buat_akun_karyawan", async (req, res) => {
       console.log(`${divisi}`);
       console.log(`${lokasi_kerja}`);
       console.log(`berhasil membuat akun karyawan`);
+
+
+      try{
+        // untuk wa
+        const number = `+62${nomer_telfon}`;
+        const text = `Assalamualaikum Sdr/i *${nama}*
+  
+Selamat Bergabung di Keluarga Violet!
+Anda Berhasil Membuat Akun Absen Karyawan!
+denga data sebagai berikut
+Nama : ${nama}
+Username : ${username}
+Password : ${password}
+nomertelfon : ${nomer_telfon}
+divisi : ${divisi}
+Lokasi Kerja : ${lokasi_kerja}
+Nik : ${buat_nik_baru}
+        
+Jika ada ketidak sesuaian data maka mohon untuk hubungi HRD.
+  
+untuk login absen ada dapat di https://absen.karyawanviolet.my.id/
+Terimaksih
+Salam
+HR Violet
+        `;
+        const chatId = `${number.substring(1)}@c.us`;
+        await sendMessage(chatId, text);
+      }
+      catch{
+        console.error('Error sending message:', error);
+      }
       res.redirect("/home");
     }
   }
@@ -775,7 +814,7 @@ app.get('/form_izin', async (req,res)=>{
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_testing;
+    const spreadsheetId = id_spreadsheets_asli;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -827,7 +866,7 @@ app.post("/proses_izin", async (req, res) => {
     // Instance of Google Sheets API
     const googleSheets = google.sheets({ version: "v4", auth: client });
    
-    const spreadsheetId = id_spreadsheets_testing;
+    const spreadsheetId = id_spreadsheets_asli;
    
     // Get metadata about spreadsheet
     const metaData = await googleSheets.spreadsheets.get({
@@ -869,6 +908,7 @@ app.post("/proses_izin", async (req, res) => {
 });
 // untuk perintah get dan post
 app.get("/data_absen", async (req, res) => {
+  if(req.session.status === "login"){
   const auth = new google.auth.GoogleAuth({
     keyFile: "credentials.json",
     scopes: "https://www.googleapis.com/auth/spreadsheets",
@@ -877,47 +917,126 @@ app.get("/data_absen", async (req, res) => {
   // ... (kode lainnya)
 
   const sheets = google.sheets('v4');
-  const spreadsheetId = id_spreadsheets_testing;
-  const range = "Sheet1!A:H";
+  const spreadsheetId = id_spreadsheets_asli;
+  const range = "Sheet1!A:I";
 
   try {
+    const currentTime = moment();
+    const {tanggal, bulan} = req.query;
+
+    if(tanggal){
+
+      // untuk bulan
+    if(tanggal==="Januari"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-01`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="Februari"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-02`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="Maret"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-03`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="April"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-04`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="Mei"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-05`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="Juni"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-06`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="Juli"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-07`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="Agustus"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-08`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="September"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-09`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="Oktober"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-10`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="November"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-11`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }else if(tanggal==="Desember"){
+      var bulan_tahun = `${currentTime.format("YYYY")}-12`;
+      console.log("mencari rekap absen :");
+      console.log(bulan_tahun); 
+    }
+    else{
+      res.redirect("/data_absen");
+    }
+
     const { data } = await sheets.spreadsheets.values.get({
       auth,
       spreadsheetId,
-      range,
+      range,  
     });
-
+    
     const values = data.values;
-
+    
     if (values && values.length) {
-      // Mencari semua baris dengan nama "moza achmad dani"
-      const targetName = "moza achmad dani";
-      const filteredRows = values.filter(row => row[0] === targetName);
 
+      const target_nik = req.session.nik;
+      const filteredRows = values.filter(row => row[1] === req.session.nik && row[3].startsWith(bulan_tahun));
+
+    
       if (filteredRows.length > 0) {
-        // Menyiapkan data untuk dirender
-        const renderedData = filteredRows.map(row => row.slice(1).join(', '));
-
-        // Melewatkan data ke template dan merender halaman
-        res.render("data_absen", {
+        // Menampilkan semua data yang sesuai
+        console.log(`Data spreadsheet nik : ${target_nik} ${req.session.nama}:`);
+        res.render("data_absen",{
           nama:req.session.nama,
-          data: renderedData
-         });
+          nik:req.session.nik,
+          rekap_absen:filteredRows,
+          data:true,
+          bulan:true
+        });
+  
       } else {
-        res.render("data_absen", {
-           nama:req.session.nama,
-           dataNotFound: true 
-          });
+        res.redirect("/data_absen?bulan=tidakada");
       }
     } else {
-      res.render("data_absen", {
-        noData: true 
-      });
+      console.log('No data found.');
     }
+  }
+  else if(bulan === "tidakada"){
+    res.render("data_absen",{
+      tanggal:tanggal,
+      nama:req.session.nama,
+      nik:req.session.nik,
+      data:false,
+      bulan:false
+    })
+  }
+  else{
+    res.render("data_absen",{
+      nama:req.session.nama,
+      nik:req.session.nik,
+      data:false,
+      bulan:true
+    });
+  }
+    
   } catch (error) {
     console.error("Error retrieving data:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(500).send("Servernya Eror Boskuuu tunggu beberapa detik untuk reload halaman lagi atau hubungi Developer");
   }
+}else{
+  res.redirect("/login");
+}
 });
 
 

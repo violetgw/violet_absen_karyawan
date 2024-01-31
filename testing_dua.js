@@ -446,7 +446,7 @@ app.get("/pilih_absen", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -509,7 +509,7 @@ if(req.session.status=="login"){
  // Instance of Google Sheets API
  const googleSheets = google.sheets({ version: "v4", auth: client });
 
- const spreadsheetId = id_spreadsheets_asli;
+ const spreadsheetId = id_spreadsheets_testing;
 
  // Get metadata about spreadsheet
  const metaData = await googleSheets.spreadsheets.get({
@@ -575,7 +575,7 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:I";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -775,7 +775,7 @@ app.get('/form_izin', async (req,res)=>{
     // ... (kode lainnya)
 
     const sheets = google.sheets('v4');
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
     const range = "Sheet1!A:H";
 
     // Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
@@ -827,7 +827,7 @@ app.post("/proses_izin", async (req, res) => {
     // Instance of Google Sheets API
     const googleSheets = google.sheets({ version: "v4", auth: client });
    
-    const spreadsheetId = id_spreadsheets_asli;
+    const spreadsheetId = id_spreadsheets_testing;
    
     // Get metadata about spreadsheet
     const metaData = await googleSheets.spreadsheets.get({
@@ -878,7 +878,7 @@ app.get("/data_absen", async (req, res) => {
   // ... (kode lainnya)
 
   const sheets = google.sheets('v4');
-  const spreadsheetId = id_spreadsheets_asli;
+  const spreadsheetId = id_spreadsheets_testing;
   const range = "Sheet1!A:I";
 
   try {
@@ -889,51 +889,51 @@ app.get("/data_absen", async (req, res) => {
 
       // untuk bulan
     if(tanggal==="Januari"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:01`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-01`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="Februari"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:02`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-02`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="Maret"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:03`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-03`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="April"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:04`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-04`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="Mei"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:05`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-05`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="Juni"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:06`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-06`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="Juli"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:07`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-07`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="Agustus"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:08`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-08`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="September"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:09`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-09`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="Oktober"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:10`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-10`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="November"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:11`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-11`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }else if(tanggal==="Desember"){
-      var bulan_tahun = `${currentTime.format("YYYY")}:12`;
+      var bulan_tahun = `${currentTime.format("YYYY")}-12`;
       console.log("mencari rekap absen :");
       console.log(bulan_tahun); 
     }
@@ -952,7 +952,8 @@ app.get("/data_absen", async (req, res) => {
     if (values && values.length) {
 
       const target_nik = req.session.nik;
-      const filteredRows = values.filter(row => row[1] === target_nik);
+      const filteredRows = values.filter(row => row[1] === req.session.nik && row[3].startsWith(bulan_tahun));
+
     
       if (filteredRows.length > 0) {
         // Menampilkan semua data yang sesuai
