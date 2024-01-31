@@ -1,0 +1,26 @@
+let jam_masuk = "08:00:00".replace(/:/g, '');
+let jam_pulang = "17:00:00".replace(/:/g, '');
+
+// let waktuTanpaColon = waktuString.replace(/:/g, '');
+
+
+let jam_masuk_int = parseInt(jam_masuk,10);
+let jam_pulang_int = parseInt(jam_pulang,10);
+
+
+// Dapatkan nilai sel di dalam kolom A (asumsikan kolom A adalah yang ingin diedit)
+const getCells = await sheets.spreadsheets.values.get({
+  auth,
+  spreadsheetId,
+  range,
+});
+
+// Dapatkan indeks baris yang sesuai dengan session.nik (misalnya, asumsikan session.nik ada di kolom A)
+const rowIndex = getCells.data.values.findIndex(row => row[1] === req.session.nik && row[3] === currentTime.format('YYYY-MM-DD')); // Menggunakan 'true' karena data di spreadsheet biasanya berupa string
+
+if (rowIndex !== -1) {
+  const jam_absen_masuk = getCells.data.values[rowIndex][6];
+  const jam_absen_pulang = getCells.data.values[rowIndex][7];
+        // Menghitung waktu
+        const waktuSelisih = hitung_waktu_string(jam, waktuAkhirBingit);
+}
