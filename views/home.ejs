@@ -68,7 +68,15 @@
       <div class="col-12 mt-3 mb-1">
         <h4 style="color: #ffffff;"></i>Selamat datang di violet!</h4>
         <h4 class="text-uppercase" style="color: #ffffff;"></i><%= nama %></h4>
-        <p>-MENU-</p>
+        <% if (absen[0]){
+          %>
+        <button type="button" class="btn btn-primary rounded-pill"  data-toggle="modal" data-target="#absen_modal">
+          <h1><%=absen[0]%></h1>
+        </button>
+        <%} else{%>
+          <h1><%=absen[2]%></h1>
+        <%}%>
+        <p style="color: #ffffff;">-MENU-</p>
       </div>
     </div>
   </center>
@@ -151,7 +159,7 @@
         </a>
         </div>
         <%}%>
-      <div class="col-xl-3 col-sm-6 col-12" data-toggle="modal" data-target="#exampleModal">
+      <div class="col-xl-3 col-sm-6 col-12" data-toggle="modal" data-target="#logout_modal">
         <div class="card">
           <div class="card-body warning">
             <div class="media">
@@ -171,8 +179,8 @@
 
 
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Modal logout -->
+<div class="modal fade" id="logout_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -191,6 +199,25 @@
     </div>
   </div>
 </div>
+
+<!-- Modal untuk lihat absen -->
+<div class="modal fade" id="absen_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        Data Absen
+      </div>
+      <div class="modal-body">
+        apakah anda ingin Logout?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+        <a style="color: #ffffff;" href="/logout" class="btn btn-warning">Yes! Logout!</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- batas isi konten -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />

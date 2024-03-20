@@ -21,8 +21,8 @@
   <section id="minimal-statistics">
     <div class="row">
       <div class="col-12 mt-3 mb-1">
-        <h4 class="text-uppercase">Hay <%= nama %></h4>
-        <p>Data Absen</p>
+        <h4 class="text-uppercase" style="color: #f0f0f0;">Hay <%= nama %></h4>
+        <p style="color: aliceblue;">Data Absen</p>
       </div>
     </div>
     <style>
@@ -198,7 +198,7 @@
         else if(bulan===false){
           %>
           <p style="color:red;">Data Tidak Ada</p>
-          <h2>pilih tanggal</h2>
+          <h2>Pilih Bulan?</h2>
           <form method="get" action="/data_absen">
           <div class="mb-3">
                     <select name="tanggal" id="tanggal" class="form-select" required>
@@ -226,7 +226,7 @@
           %>
 
 
-          <h2>pilih tanggal</h2>
+          <h2>pilih Bulan</h2>
           <form method="get" action="/data_absen">
           <div class="mb-3">
                     <select name="tanggal" id="tanggal" class="form-select" required>
