@@ -221,26 +221,43 @@ app.get("/sukses_absen", (req, res) => {
 
 // ini untuk scan masuk
 app.get("/scan_absen_masuk", (req, res) => {
+  const currentTime = moment();
   if(req.session.status=="login"){
+    if(req.session.keterangan_absen==`absen masuk`){
+  console.log(`--------------`);
+  console.log(`Jam ${currentTime.format("HH:mm:ss")}}`);
+  console.log(`Nama Ingin Absen Masuk: ${req.session.nama}`);
+  console.log(`--------------`);
   res.render("scan_absen_masuk");
-  }
-  else{
+    }
+    else{
+      res.redirect("/login");
+    }
+      } else{
     res.redirect("/login");
   }
 });
 
 // ini untuk scan pulang
 app.get("/scan_absen_pulang", (req, res) => {
+  const currentTime = moment();
   if(req.session.status=="login"){
-  res.render("scan_absen_pulang");
-  }
-  else{
+    if(req.session.keterangan_absen==`absen pulang`){
+    console.log(`--------------`);
+    console.log(`Jam ${currentTime.format("HH:mm:ss")}}`);
+    console.log(`Nama Ingin Absen Pulang: ${req.session.nama}`);
+    console.log(`--------------`);
+    res.render("scan_absen_pulang");
+    }
+    else{
+      res.redirect("/login")
+    }
+      }else{
     res.redirect("/login");
   }
 });
 
 app.get('/login', async (req, res) => {
-
   const { status_login } = req.query;
   let status_login_ke_ejs;
 
@@ -404,8 +421,49 @@ else {
 
 });
 app.get('/home', async (req,res)=>{
-
 if(req.session.status=="login"){
+  // const currentTime = moment();
+  // const auth = new google.auth.GoogleAuth({
+  //   keyFile: "credentials.json",
+  //   scopes: "https://www.googleapis.com/auth/spreadsheets",
+  // });
+
+  // // ... (kode lainnya)
+
+  // const sheets = google.sheets('v4');
+  // const spreadsheetId = id_spreadsheets_asli;
+  // const range = "Sheet1!A:H";
+
+  // const getCells = await sheets.spreadsheets.values.get({
+  //   auth,
+  //   spreadsheetId,
+  //   range,
+  // });
+
+  // const rowIndex = await getCells.data.values.findIndex(row => row[1] === req.session.nik && row[3] === currentTime.format('YYYY-MM-DD')); // Menggunakan 'true' karena data di spreadsheet biasanya berupa string
+
+  // try{
+  //   console.log(`${req.session.status_absen_nama}${req.session.status_absen_jam_masuk}${req.session.status_absen_jam_pulang}${getCells.data.values[rowIndex][1]}`)
+  
+
+  // if(req.session.status_absen_jam_masuk || req.session.status_absen_jam_pulang){
+  //   console.log("session data sudah ada");
+  // }
+  // else{
+  //   console.log("data belum ada");
+  //   req.session.status_absen_nama=getCells.data.values[rowIndex][0];
+  //   req.session.status_absen_jam_masuk=getCells.data.values[rowIndex][6];
+  //   req.session.status_absen_jam_pulang=getCells.data.values[rowIndex][7];
+  //   console.log("namun sudah di buat");
+  // }
+
+  // }
+  // catch{
+  //   req.session.status_absen_nama=false;
+  //   req.session.status_absen_jam_masuk=false;
+  //   req.session.status_absen_jam_pulang=false;
+  //   console.log("kita semua buat session fasle semua");
+  // }
   const db_data = await kirim_akun_karyawan_violet.findOne({nama:req.session.nama,username:req.session.username,password:req.session.password},"nama username password").exec();
   
   if(db_data){
@@ -414,7 +472,8 @@ if(req.session.status=="login"){
       username:req.session.username,
       password:req.session.password,
       status_login:req.session.status,
-      divisi:req.session.divisi                    
+      divisi:req.session.divisi
+      // absen:[req.session.status_absen_nama,req.session.status_absen_jam_masuk,req.session.status_absen_jam_pulang]                   
       });
   }
   else{
@@ -467,13 +526,16 @@ app.get("/pilih_absen", async (req, res) => {
       const jam_absen_masuk = getCells.data.values[rowIndex][6];
       const jam_absen_pulang = getCells.data.values[rowIndex][7];
       if(!jam_absen_pulang){
-        console.log("dia ngga ada ada absen pualngnya");
+      console.log(`test ${jam_absen_pulang}`);
+        console.log(`pilihanya absen pulang ${req.session.nama}`);
+        req.session.keterangan_absen="absen pulang";
         res.render("pilih_absen",{
           jam_absen_masuk:true,
           jam_absen_pulang:false,
         });
       }
       else{
+        req.session.keterangan_absen=false;
         res.render("berhasil_absen",{
           nama:req.session.nama
         });
@@ -484,7 +546,8 @@ app.get("/pilih_absen", async (req, res) => {
 
 
     } else {
-      console.log(`"dia ngga ada absen masuknya`);
+      console.log(`pilihanya absen masuk ${req.session.nama}`);
+      req.session.keterangan_absen="absen masuk";
       res.render("pilih_absen",{
         jam_absen_masuk:false,
         jam_absen_pulang:false
@@ -538,13 +601,18 @@ if(req.session.status=="login"){
     values: [[req.session.nama,`'${req.session.nik}`,req.session.lokasi_kerja,currentTime.format('YYYY-MM-DD'),lokasi,req.session.divisi,currentTime.format('HH:mm:ss')]],
    },
  });
- console.log(`Data Absen yang ke data masuk`);
+ console.log(`-------------------------------`);
+ console.log(`jam ${currentTime.format("HH:mm:ss")}}`);
+ console.log(`Data Absen masuk`);
  console.log(`username = ${req.session.username}`);
  console.log(`nik = ${req.session.nik}`);
  console.log(`nama = ${req.session.nama}`);
  console.log(`divisi = ${req.session.divisi}`);
  console.log(`lokasi = ${lokasi}`);
  console.log(`lokasi kerja = ${req.session.lokasi_kerja}`);
+ console.log(`-------------------------------`);
+ req.session.keterangan_absen="absen pulang";
+
 
 //  try {
 //    // untuk wa
@@ -627,14 +695,18 @@ app.get("/data_absen_pulang_karyawan", async (req, res) => {
       });
 
     
+      console.log(`-------------------------------`);
+      console.log(`jam ${currentTime.format("HH:mm:ss")}}`);
 
-      console.log(`Data Absen yang ke data masuk`);
+      console.log(`Data Absen Pulang`);
       console.log(`username = ${req.session.username}`);
       console.log(`nik = ${req.session.nik}`);
       console.log(`nama = ${req.session.nama}`);
       console.log(`divisi = ${req.session.divisi}`);
       console.log(`lokasi = ${lokasi}`);
       console.log(`lokasi kerja = ${req.session.lokasi_kerja}`);
+      console.log(`-------------------------------`);
+      req.session.keterangan_absen=false;
 
     //   try {
     //     // kirim ke wa
@@ -997,6 +1069,7 @@ app.get("/data_absen", async (req, res) => {
       if (filteredRows.length > 0) {
         // Menampilkan semua data yang sesuai
         console.log(`Data spreadsheet nik : ${target_nik} ${req.session.nama}:`);
+        console.log(`---------------------------------------------------`);
         res.render("data_absen",{
           nama:req.session.nama,
           nik:req.session.nik,
