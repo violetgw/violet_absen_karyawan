@@ -422,38 +422,48 @@ else {
 });
 app.get('/home', async (req,res)=>{
 if(req.session.status=="login"){
-  const currentTime = moment();
-  const auth = new google.auth.GoogleAuth({
-    keyFile: "credentials.json",
-    scopes: "https://www.googleapis.com/auth/spreadsheets",
-  });
+  // const currentTime = moment();
+  // const auth = new google.auth.GoogleAuth({
+  //   keyFile: "credentials.json",
+  //   scopes: "https://www.googleapis.com/auth/spreadsheets",
+  // });
 
-  // ... (kode lainnya)
+  // // ... (kode lainnya)
 
-  const sheets = google.sheets('v4');
-  const spreadsheetId = id_spreadsheets_testing;
-  const range = "Sheet1!A:H";
+  // const sheets = google.sheets('v4');
+  // const spreadsheetId = id_spreadsheets_testing;
+  // const range = "Sheet1!A:H";
 
-  const getCells = await sheets.spreadsheets.values.get({
-    auth,
-    spreadsheetId,
-    range,
-  });
-  console.log(`${req.session.status_absen_nama}${req.session.status_absen_jam_masuk}${req.session.status_absen_jam_pulang}`)
-  req.session.status_absen_nama;
-  req.session.status_absen_jam_masuk;
-  req.session.status_absen_jam_pulang;
-  if(req.session.status_absen_nama && req.session.status_absen_jam_masuk && req.session.status_absen_jam_pulang){
-    console.log("session data sudah ada");
-  }else{
-    console.log("data belum ada");
-    req.session.status_absen_nama=getCells.data.values[0];
-    req.session.status_absen_jam_masuk=getCells.data.values[6];
-    req.session.status_absen_jam_pulang=getCells.data.values[7];
-    console.log("namun sudah di buat");
-  }
+  // const getCells = await sheets.spreadsheets.values.get({
+  //   auth,
+  //   spreadsheetId,
+  //   range,
+  // });
 
+  // const rowIndex = await getCells.data.values.findIndex(row => row[1] === req.session.nik && row[3] === currentTime.format('YYYY-MM-DD')); // Menggunakan 'true' karena data di spreadsheet biasanya berupa string
 
+  // try{
+  //   console.log(`${req.session.status_absen_nama}${req.session.status_absen_jam_masuk}${req.session.status_absen_jam_pulang}${getCells.data.values[rowIndex][1]}`)
+  
+
+  // if(req.session.status_absen_jam_masuk || req.session.status_absen_jam_pulang){
+  //   console.log("session data sudah ada");
+  // }
+  // else{
+  //   console.log("data belum ada");
+  //   req.session.status_absen_nama=getCells.data.values[rowIndex][0];
+  //   req.session.status_absen_jam_masuk=getCells.data.values[rowIndex][6];
+  //   req.session.status_absen_jam_pulang=getCells.data.values[rowIndex][7];
+  //   console.log("namun sudah di buat");
+  // }
+
+  // }
+  // catch{
+  //   req.session.status_absen_nama=false;
+  //   req.session.status_absen_jam_masuk=false;
+  //   req.session.status_absen_jam_pulang=false;
+  //   console.log("kita semua buat session fasle semua");
+  // }
   const db_data = await kirim_akun_karyawan_violet.findOne({nama:req.session.nama,username:req.session.username,password:req.session.password},"nama username password").exec();
   
   if(db_data){
@@ -462,8 +472,8 @@ if(req.session.status=="login"){
       username:req.session.username,
       password:req.session.password,
       status_login:req.session.status,
-      divisi:req.session.divisi,
-      absen:[req.session.status_absen_nama,req.session.status_absen_jam_masuk,req.session.status_absen_jam_pulang]                   
+      divisi:req.session.divisi
+      // absen:[req.session.status_absen_nama,req.session.status_absen_jam_masuk,req.session.status_absen_jam_pulang]                   
       });
   }
   else{
@@ -525,6 +535,7 @@ app.get("/pilih_absen", async (req, res) => {
         });
       }
       else{
+        req.session.keterangan_absen=false;
         res.render("berhasil_absen",{
           nama:req.session.nama
         });

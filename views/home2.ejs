@@ -68,6 +68,14 @@
       <div class="col-12 mt-3 mb-1">
         <h4 style="color: #ffffff;"></i>Selamat datang di violet!</h4>
         <h4 class="text-uppercase" style="color: #ffffff;"></i><%= nama %></h4>
+        <button type="button" class="btn btn-primary rounded-pill"  data-toggle="modal" data-target="#absen_modal">
+        <% if (absen[3]){
+          %>
+          <h1><%=absen[3]%></h1>
+        <%} else{%>
+          <h1>sadsadas</h1>
+        <%}%>
+      </button>
         <p style="color: #ffffff;">-MENU-</p>
       </div>
     </div>
