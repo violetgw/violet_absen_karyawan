@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="favicon.ico?v=1.1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilih Absen</title>
+    <style>
+      /* Custom CSS */
+      body{
+        background-image: linear-gradient(to right, rgb(228, 100, 174) , rgb(163, 95, 241));
+
+      }
+      .box-container {
+        border: 1px solid #ccc;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+      }
+      .box-icon {
+        font-size: 24px;
+        margin-right: 10px;
+      }
+      .box-content {
+        flex-grow: 1;
+      }
+      h3,span{
+        position: relative;
+        left: 10px;
+      }
+      .loading-container {
+    text-align: center;
+    z-index: 10000; /* Ensure the loading container is above the overlay */
+  }
+
+  .loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 2s linear infinite;
+    margin: 0 auto 10px;
+  }
+      /* Responsive Styles */
+      @media (max-width: 576px) {
+        .box-container {
+          flex-direction: column;
+        }
+        .box-icon {
+          margin-right: 0;
+          margin-bottom: 10px;
+        }
+      }
+    </style>
+</head>
+<body>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<!-- isi konten -->
+
+<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/bootstrap-extended.min.css">
+<link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/fonts/simple-line-icons/style.min.css">
+<link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/colors.min.css">
+<link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+
+<center>
+<i style="position: relative; top: 40px;" class="icon-user font-large-2 float-center "></i>
+<div class="grey-bg container-fluid">
+  <section id="minimal-statistics">
+    <div class="row">
+      <div class="col-12 mt-3 mb-1">
+        <h4 class="text-uppercase text-success"></i>Mau Absen ?</h4>
+        <h4 class="text-uppercase text-info"></i></h4>
+        <p>-MENU-</p>
+      </div>
+    </div>
+    <div class="overlay">
+        <div class="loading-container">
+          <div class="loader"></div>
+          <p style="color: aliceblue;">Sedang Mencari Lokasi Anda...</p>
+        </div>
+      </div>
+  </center>
+
+<!-- Modal untuk lanjut -->
+<div class="modal fade" id="modal_lanjut_gps" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Anda Berada Di lokasi kerja!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        yeeeeyyy
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="to_lulus_gps()">Lanjut Ke Absen</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal untuk reload -->
+<div class="modal fade" id="modal_reload_gps" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Anda Tidak Berada Di lokasi kerja!</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Mohon Untuk Di sesuai titik lokasi kera ya :)
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="reload_gps()">Reload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Modal untuk tidak izin Lokasi -->
+<div class="modal fade" id="tidak_ada_izin_gps" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Tolong Beri Izin GPS Dan nyalakan GPS Anda!</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          mohon nyalain ya teman teman pliisss :)
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="reload_gps()">Reload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal kesalahan modal -->
+<div class="modal fade" id="gagal_gps" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ada Kesalhan Di Gps!</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Telpon MOja aja atau HRD kalau gini Terus Hehehe :)
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="reload_gps()">Reload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- untuk loading  -->
+  <div class="container">
+    <div class="row">
+        <h1 id="text_pesan_gps" style="color: aliceblue;"></h1>
+    </div>
+  </div> 
+  
+<!-- batas isi konten -->
+<script type="text/javascript" >
+    const overlay = document.querySelector(".overlay");
+    const options = {
+    enableHighAccuracy: true, 
+    timeout: 5000,
+    maximumAge: 2000, 
+    };
+    navigator.geolocation.watchPosition(success, error, options);
+    function success(pos) {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    const accuracy = pos.coords.accuracy;
+    console.log(lat);
+    console.log(lng);
+    
+    
+    if(lat <= -6.2200000 && lat >= -6.2990000 && lng >= 107.0200000 && lng <= 107.0400000){
+        overlay.style.display = "none";
+        $('#modal_lanjut_gps').modal('show');
+
+    }
+    else{
+    overlay.style.display = "none";
+    $('#modal_reload_gps').modal('show');
+    document.getElementById('text_pesan_gps').innerText = `maaf anda sedang tidak ada di lokasi kerja saat ini
+    muat ulang untuk refresh lokasi anda`;
+    
+    }
+    }
+    function error(err) {
+    if (err.code === 1) {
+
+    overlay.style.display = "none";
+    document.getElementById('text_pesan_gps').innerText = `maaf anda sedang tidak mengaktifkan atau mengizinkan GPS tOLONG Aktifkan dan Reload Halaman Ini`;
+    $('#tidak_ada_izin_gps').modal('show');
+    
+
+    }else {
+
+    overlay.style.display = "none";
+    $('#gagal_gps').modal('show');
+    
+}
+    }
+    function to_lulus_gps(){
+        window.location = '/lulus_get_gps?token_gps=lulus';
+    }
+    function reload_gps(){
+        window.location = '/get_gps';
+    }
+    </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

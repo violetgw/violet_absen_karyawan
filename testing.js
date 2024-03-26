@@ -834,26 +834,13 @@ HR Violet
 });
 
 
-// untuk edit data akun
-app.put('/edit_akun_karyawan/:id_edit', async (req, res) => {
-  try {
-    const { id_edit } = req.params;
-    const { username, password, nama, nik, nomer_telfon , divisi,lokasi_kerja,jumlah_login } = req.body;
-    console.log(req.body);
+// scan absen
+app.get('/get_gps', async (req, res) => {
+  const {lat,lng} = req.query;
+res.render("get_gps");
 
-    
-    const updatedVCF = await kirim_akun_karyawan_violet.findByIdAndUpdate(
-      id_edit,
-      { username, password, nama, nik, nomer_telfon , divisi,lokasi_kerja,jumlah_login  },
-      { new: true } 
-    );
-
-    res.json(updatedVCF);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Terjadi kesalahan server.' });
-  }
 });
+
 
 app.put('/hapus_akun/:id_akun_hapus', async (req, res) => {
   try {
