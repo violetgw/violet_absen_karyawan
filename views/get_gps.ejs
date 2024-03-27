@@ -191,10 +191,11 @@
     else{
     overlay.style.display = "none";
     $('#modal_reload_gps').modal('show');
-    document.getElementById('text_pesan_gps').innerText = `maaf anda sedang tidak ada di lokasi kerja saat ini
+    document.getElementById('text_pesan_gps').innerText = `maaf anda sedang tidak ada di lokasi kerja saat ini.
     muat ulang untuk refresh lokasi anda`;
     
     }
+
     }
     function error(err) {
     if (err.code === 1) {

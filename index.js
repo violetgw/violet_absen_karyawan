@@ -839,7 +839,26 @@ app.get('/get_ip', async (req, res) => {
   
   res.render("get_ip");
 });
+// untuk edit data akun
+app.put('/edit_akun_karyawan/:id_edit', async (req, res) => {
+  try {
+    const { id_edit } = req.params;
+    const { username, password, nama, nik, nomer_telfon , divisi,lokasi_kerja,jumlah_login } = req.body;
+    console.log(req.body);
 
+    
+    const updatedVCF = await kirim_akun_karyawan_violet.findByIdAndUpdate(
+      id_edit,
+      { username, password, nama, nik, nomer_telfon , divisi,lokasi_kerja,jumlah_login  },
+      { new: true } 
+    );
+
+    res.json(updatedVCF);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Terjadi kesalahan server.' });
+  }
+});
 app.put('/hapus_akun/:id_akun_hapus', async (req, res) => {
   try {
     const { id_akun_hapus } = req.params;
