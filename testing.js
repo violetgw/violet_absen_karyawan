@@ -228,6 +228,7 @@ app.get("/scan_absen_masuk", (req, res) => {
   console.log(`Jam ${currentTime.format("HH:mm:ss")}}`);
   console.log(`Nama Ingin Absen Masuk: ${req.session.nama}`);
   console.log(`--------------`);
+  req.session.status_gps="";
   res.render("scan_absen_masuk");
     }
     else{
@@ -247,6 +248,7 @@ app.get("/scan_absen_pulang", (req, res) => {
     console.log(`Jam ${currentTime.format("HH:mm:ss")}}`);
     console.log(`Nama Ingin Absen Pulang: ${req.session.nama}`);
     console.log(`--------------`);
+    req.session.status_gps="";
     res.render("scan_absen_pulang");
     }
     else{
@@ -500,6 +502,7 @@ app.get('/logout',(req,res)=>{
 app.get("/pilih_absen", async (req, res) => {
 
   if (req.session.status == "login") {
+    if(req.session.status_gps == "lulus"){
     const currentTime = moment();
     const auth = new google.auth.GoogleAuth({
       keyFile: "credentials.json",
@@ -544,7 +547,6 @@ app.get("/pilih_absen", async (req, res) => {
       //   jenis_absen:data_h
       // });
 
-
     } else {
       console.log(`pilihanya absen masuk ${req.session.nama}`);
       req.session.keterangan_absen="absen masuk";
@@ -553,7 +555,11 @@ app.get("/pilih_absen", async (req, res) => {
         jam_absen_pulang:false
     });
     }
-    
+   
+  }
+    else{
+      res.redirect("/get_gps");
+    }
   } else {
      res.redirect("/login");
   }
@@ -834,13 +840,33 @@ HR Violet
 });
 
 
-// scan absen
+// Gpss
 app.get('/get_gps', async (req, res) => {
+
+if(req.session.status == "login"){
   const {lat,lng} = req.query;
-res.render("get_gps");
+  res.render("get_gps");
+
+}
+else{
+res.redirect("/home");
+}
 
 });
 
+
+
+// Gpss
+app.get('/lulus_get_gps', async (req, res) => {
+if(req.session.status){
+const {token_gps} = req.query;
+console.log(token_gps);
+req.session.status_gps= token_gps;
+res.redirect("pilih_absen");
+}else{
+res.redirect("/home");
+}
+});
 
 app.put('/hapus_akun/:id_akun_hapus', async (req, res) => {
   try {
