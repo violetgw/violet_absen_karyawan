@@ -146,12 +146,12 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Ada Kesalahan Di Gps!</h5>
+          <h5 class="modal-title text-danger" id="exampleModalLabel">Yahhh :) Ada Kesalahan Di Gps Child</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body text-danger">
           Reload Aja ya Anak Kecil :)
         </div>
         <div class="modal-footer">
@@ -185,8 +185,7 @@
     
     
     if(lat <= -6.2900000 && lat >= -6.2990000 && lng >= 107.0200000 && lng <= 107.0400000){
-        overlay.style.display = "none";
-        $('#modal_lanjut_gps').modal('show');
+        window.location="/lulus_get_gps?token_gps=lulus";
 
     }
     else{
